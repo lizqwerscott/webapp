@@ -1,7 +1,5 @@
-;;;;The web asd
-
-(defsystem web-manager
- :name "web"
+(defsystem webmanager
+ :name "webmanager"
  :version "0.0.0"
  :maintainer "lizqwer scott"
  :author "lizqwer scott"
