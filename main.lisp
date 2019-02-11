@@ -2,22 +2,33 @@
 ;;;;Time:2019.2.1 20:24 by lscott
 ;;;;The local path "TheWebApp/main.lisp"
 
-(ql:quickload "cl-events") ;load event
-(ql:quickload "lparallel") ;load thread pool manager
-
-(ql:quickload "cl-json") ;load json
-(ql:quickload "websocket-driver") ;load websocket
+(in-package :web-manager)
 
 ;;;Make event
 (defun make-broadcast-event ()
-  (make-instance 'cl-events:broadcast-event))
+  (make-instance 'broadcast-event))
 
 ;;;get the thread name[sample]
 (defun get-thread-name ()
-  (bordeaux-threads:thread-name (bordeaux-threads:current-thread)))
+  (thread-name (current-thread)))
 
-;;;load another module
-(load "./aria2/aria2.lisp") ;load aria2 module
+(defgeneric start-task (task-one)
+  (:documentation "start the task"))
+
+(defgeneric pause-task (task-one)
+  (:documentation "pause the task"))
+
+(defgeneric unpause-task (task-one)
+  (:documentation "unpause-task"))
+
+(defgeneric get-task-download-info (task-one key)
+  (:documentation "get the key status from the task"))
+
+(defgeneric show-task (task-one)
+  (:documentation "show the task some info"))
+
+(defgeneric update-task (task-one)
+  (:documentation "finish the task"))
 
 ;;;The Task class
 (defclass task ()
@@ -39,9 +50,9 @@
      (on-start 
        :initform (make-broadcast-event)
        :accessor task-on-start)
-     (on-stop
+     (on-pause
        :initform (make-broadcast-event)
-       :accessor task-on-stop)))
+       :accessor task-on-pause)))
 
 (defmethod initialize-instance :after ((task-one task) &key)
   (setf (task-download-file task-one) (make-download (name task-one) (url task-one))))
@@ -51,44 +62,35 @@
 ;(defparameter *finish-task-list* (make-array 5 :fill-pointer 0 :adjustable t) "The Finish task List")
 ;(defparameter *failure-task-list* (make-array 5 :fill-pointer 0 :adjustable t) "The Failure task List")
 
-(defun find-task (name)
-  (find name *run-task-list* :key #'name :test #'string=))
+(defmethod start-task ((task-one))
+  (event! (task-on-start task-one) task-one))
 
-(defun update-task (name)
-  (format t "Run:update-task:~a~%" name)
-  (let ((task-one (find-task name)) (return-number 1));(get-thread-name))))
+(defun pause-task ((task-one task))
+  (setf (run-status task-one) "pause")
+  (pause-download (task-download-file task-one)))
+
+(defun unpause-task ((task-one task))
+  (setf (run-status task-one) "download")
+  (unpause-download (task-download-file task-one)))
+
+(defun get-task-download-info ((task-one task) key)
+  (get-staus (task-download-file) key))
+
+(defun show-task ((task-one task))
+  (format t "name:~a~%url:~a~%run-satatus:~a~%" 
+          (slot-value task-one 'name) 
+          (slot-value task-one 'url) 
+          (slot-value task-one 'run-status)))
+
+(defun update-task ((task-one task))
+  (format t "Run:update-task:~a~%" (name task-one))
+  (format t "Run:Download.~%")
+  (let ((return-number 1))
     (do ((n 0 (+ n 1)))
-        ((and (string= "complete" (run-status task-one)) (string= "stop" (run-status task-one))) return-number)
-      ;;update-all-task
-      (when (not (string= "stop" (run-status task-one)))
-        (update-download (task-download-file task-one)))))
-  (format t "Update-task:End;~%"))
-
-;;;About task some operating
-(defun add-task (name url)
-  (let ((task-one (make-instance 'task :name name :url url)))
-    (vector-push task-one *run-task-list*)
-    (cl-events:event+ (task-on-start task-one) #'update-task)))
-
-(defun remove-task (name)
-  (remove-download (task-download-file (find-task name)))
-  (setf *run-task-list* (remove name *run-task-list* :key #'name :test #'string=)))
-
-(defun stop-task (name)
-  (let ((task-one (find-task name)))
-    (setf (run-status task-one) "stop")
-    (pause-download (task-download-file task-one))))
-
-(defun restart-task (name)
-  (let ((task-one (find-task name)))
-    (setf (run-status task-one) "download")
-    (unpause-download (task-download-file task-one))))
-
-(defun get-task-download (name key)
-  (get-staus (task-download-file (find-task name)) key))
-
-(defun show-task (task-one)
-  (format t "name:~a~%url:~a~%run-satatus:~a~%" (slot-value task-one 'name) (slot-value task-one 'url) (slot-value task-one 'run-status)))
+        ((not (string= "Download" (run-status task-one))) return-number)
+        ;;update-all-task
+        (update-download (task-download-file task-one))))
+  (format t "End:update-task:~a~%" (name task-one)))
 
 (defun show-list ()
   (doTimes (i (length *run-task-list*))
@@ -96,18 +98,24 @@
     (show-task (elt *run-task-list* i))
     (format t "[~a]:End~%" (+ i 1))))
 
+(defun find-task (name)
+  (find name *run-task-list* :key #'name :test #'string=))
+
+;;;About task some operating
+(defun add-task (name url)
+  (let ((task-one (make-instance 'task :name name :url url)))
+    (vector-push task-one *run-task-list*)
+    (event+ (task-on-start task-one) #'update-task) task-one))
+
+(defun remove-task (name)
+  (remove-download (task-download-file (find-task name)))
+  (setf *run-task-list* (remove name *run-task-list* :key #'name :test #'string=)))
+
 (defun run-manager () 
   (doTimes (i (length *run-task-list*))
     (format t "Run:run-manager~%")
     ;(bordeaux-threads:make-thread 'update-task :name (name (elt *run-task-list* i)))
-    (cl-events:event! (task-on-start (elt *run-task-list* i)) (name (elt *run-task-list* i)))))
+    (event! (task-on-start (elt *run-task-list* i)) (name (elt *run-task-list* i)))))
 
-;(event-glue:bind "stop-task" (lambda (ev) (format t "[Event1]:name:stop-task,thread-name:~a" (get-thread-name))))
-;(event-glue:bind "stop-task" (lambda (ev) (format t "[Event2]:name:stop-task,thread-name:~a" (get-thread-name))))
-;(add-task "baidu" "https://baidu.com")
-;(add-task "bilibili" "https://bilibili.com")
-;(show-list *run-task-list*)
-;(run-manager)
-;(show-list *run-task-list*)
-;(sleep 0.001)
-;(stop-task "baidu")
+(in-package :cl-user)
+
