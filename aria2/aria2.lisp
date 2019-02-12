@@ -3,6 +3,10 @@
 
 (in-package :aria2-manager)
 
+;;;Make event
+(defun make-broadcast-event ()
+  (make-instance 'broadcast-event))
+
 ;;;make client and connect my sever
 (defvar *client* (make-client "ws://192.168.0.104:6800/jsonrpc"))
 (start-connection *client*)
@@ -12,7 +16,7 @@
 (defgeneric update-download (download)
   (:documentation "Update download. Get the info from sever"))
 
-(defgeneric get-download-info (download)
+(defgeneric get-download-info (download key)
   (:documentation "Get the all info of download(info about[status, totalLength, completedLength, downloadSpeed])"))
 
 (defgeneric remove-download (download)
@@ -101,7 +105,7 @@
           #'(lambda (gid) (format t "[Unpause:id:~a,gid:~a]~%" (download-id download) gid)))
     (send *client* data)))
 
-(defmethod get-staus ((download download-object) key)
+(defmethod get-download-info ((download download-object) key)
   (cdr (assoc key (download-data download))))
 
 (on :message *client*

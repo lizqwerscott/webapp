@@ -42,7 +42,7 @@
         :reader url)
      (run-status
         :initarg :run-status
-        :initform "Download"
+        :initform "download"
    		:accessor run-status)
      (download-file
        :accessor task-download-file)
@@ -55,39 +55,40 @@
        :accessor task-on-pause)))
 
 (defmethod initialize-instance :after ((task-one task) &key)
-  (setf (task-download-file task-one) (make-download (name task-one) (url task-one))))
+  (setf (task-download-file task-one) (make-download (name task-one) (url task-one)))
+  (event+ (task-on-start task-one) #'update-task) task-one)
 
 ;;;The list of task
 (defparameter *run-task-list* (make-array 5 :fill-pointer 0 :adjustable t) "The Run task List")
 ;(defparameter *finish-task-list* (make-array 5 :fill-pointer 0 :adjustable t) "The Finish task List")
 ;(defparameter *failure-task-list* (make-array 5 :fill-pointer 0 :adjustable t) "The Failure task List")
 
-(defmethod start-task ((task-one))
+(defmethod start-task ((task-one task))
   (event! (task-on-start task-one) task-one))
 
-(defun pause-task ((task-one task))
+(defmethod pause-task ((task-one task))
   (setf (run-status task-one) "pause")
   (pause-download (task-download-file task-one)))
 
-(defun unpause-task ((task-one task))
+(defmethod unpause-task ((task-one task))
   (setf (run-status task-one) "download")
   (unpause-download (task-download-file task-one)))
 
-(defun get-task-download-info ((task-one task) key)
-  (get-staus (task-download-file) key))
+(defmethod get-task-download-info ((task-one task) key)
+  (get-download-info (task-download-file task-one) key))
 
-(defun show-task ((task-one task))
+(defmethod show-task ((task-one task))
   (format t "name:~a~%url:~a~%run-satatus:~a~%" 
           (slot-value task-one 'name) 
           (slot-value task-one 'url) 
           (slot-value task-one 'run-status)))
 
-(defun update-task ((task-one task))
+(defmethod update-task ((task-one task))
   (format t "Run:update-task:~a~%" (name task-one))
   (format t "Run:Download.~%")
   (let ((return-number 1))
     (do ((n 0 (+ n 1)))
-        ((not (string= "Download" (run-status task-one))) return-number)
+        ((not (string= "download" (run-status task-one))) return-number)
         ;;update-all-task
         (update-download (task-download-file task-one))))
   (format t "End:update-task:~a~%" (name task-one)))
@@ -105,7 +106,7 @@
 (defun add-task (name url)
   (let ((task-one (make-instance 'task :name name :url url)))
     (vector-push task-one *run-task-list*)
-    (event+ (task-on-start task-one) #'update-task) task-one))
+    (start-task task-one)))
 
 (defun remove-task (name)
   (remove-download (task-download-file (find-task name)))
