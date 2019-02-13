@@ -88,9 +88,15 @@
   (format t "Run:Download.~%")
   (let ((return-number 1))
     (do ((n 0 (+ n 1)))
-        ((not (string= "download" (run-status task-one))) return-number)
+        ((not (and (string= "download" (run-status task-one)) (string "complete" (get-task-download-info task-one :status)))) return-number)
         ;;update-all-task
         (update-download (task-download-file task-one))))
+  (setf (run-status task-one) "zip")
+  (format t "Run:Zip.~%")
+  (setf (run-status task-one) "move")
+  (format t "Run:Move~%")
+  
+  (format t "Run:")
   (format t "End:update-task:~a~%" (name task-one)))
 
 (defun show-list ()
