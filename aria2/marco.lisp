@@ -1,6 +1,6 @@
 ;;;;All marco
 
-(in-package :aria2-manager)
+(in-package :web-manager.aria2)
 
 ;;;2019.2.8:Dont use hash-table
 (defun create-send-data (id-d method-d params-d)

@@ -7,7 +7,7 @@
 ;(ql:quickload "cl-json") ;load json
 ;(ql:quickload "websocket-driver") ;load websocket
 
-(defpackage :aria2-manager
+(defpackage :web-manager.aria2
   (:use :common-lisp :cl-events :cl-json :websocket-driver)
   (:export :update-download
            :get-download-info
@@ -19,6 +19,10 @@
            :make-download
            :get-connection-state
            :restart-connect))
+
+(defpackage :web-manager.file
+  (:use :common-lisp :cl-events)
+  (:export :))
 
 (defpackage :web-manager
   (:use :common-lisp :asdf :aria2-manager :cl-events :lparallel :bordeaux-threads)

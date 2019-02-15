@@ -1,7 +1,7 @@
 ;;;;Time:2019.2.5 17:37 by lscott
 ;;;;The local path "TheWebApp/aria2/aria2.lisp"
 
-(in-package :aria2-manager)
+(in-package :web-manager.aria2)
 
 ;;;Make event
 (defun make-broadcast-event ()
