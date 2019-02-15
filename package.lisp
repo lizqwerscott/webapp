@@ -25,7 +25,7 @@
   (:export :))
 
 (defpackage :web-manager
-  (:use :common-lisp :asdf :aria2-manager :cl-events :lparallel :bordeaux-threads)
+  (:use :common-lisp :asdf :web-manager.aria2 :web-manager.file :cl-events :lparallel :bordeaux-threads)
   (:export :add-task
            :remove-task
            :task
