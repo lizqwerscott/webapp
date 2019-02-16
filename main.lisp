@@ -88,7 +88,7 @@
   (format t "Run:Download.~%")
   (let ((return-number 1))
     (do ((n 0 (+ n 1)))
-        ((not (and (string= "download" (run-status task-one)) (string "complete" (get-task-download-info task-one :status)))) return-number)
+        ((not (and (string= "download" (run-status task-one)) (string= "complete" (get-task-download-info task-one :status)))) return-number)
         ;;update-all-task
         (update-download (task-download-file task-one))))
   (setf (run-status task-one) "zip")

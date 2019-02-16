@@ -9,14 +9,8 @@
      (sb-ext:run-program "/bin/sh" (list "-c" cmd) :input nil :output nil)))
 
 (defvar *table-manager-hash* (make-hash-table :test #'equal))
-
-(defun add-table-group (key)
-  (setf (gethash key *table-manager-hash*) (make-array 10 :fill-pointer 0 :adjustable t)))
-
-(add-table-group "Video")
-(add-table-group "Music")
-(add-table-group "Game")
-(add-table-group "MMD")
+;(defparameter *drive-path* "/mnt/myusbdrives/")
+(defparameter *drive-path* (make-pathname :directory '(:absolute :home "Documents" "test-web")))
 
 (defclass table ()
   ((name 
@@ -46,8 +40,9 @@
      :initarg :description
      :reader table-description)))
 
+;;;A very more will to change
 (defmethod make-table-dir ((table-one table))
-  (let ((path (format nil "/mnt/myusbdrives/~a" (table-attributes table-one))))
+  (let ((path (format nil "~a~a" *drive-path*  (table-attributes table-one))))
     (if (table-isNormal table-one)
         (setf path (format nil "~a/Normal/~a" path (table-name table-one)))
         (setf path (format nil "~a/~a" path (table-name table-one))))
@@ -60,13 +55,29 @@
   (run-shell (format nil "mv -r ~a ~a" b-path (table-b-path table-one)))
   (run-shell (format nil "mv ~a ~a" y-path (table-y-path table-one))))
 
+(defmethod save-table ((table-one table))
+  ())
+
 (defmethod initialize-instance :after ((table-one table) &key b-path y-path)
   (make-table-dir table-one)
   (move-table table-one b-path y-path))
 
-(defun add-table (name url attributes isNormal description)
+(defun load-table-group (key)
+  (let ((path (merge-pathnames (pathname (format nil "~a/" key)) *drive-path*))
+        (table-group (setf (gethash key *table-manager-hash*) (make-array 10 :fill-pointer 0 :adjustable t)))) 
+    (if (not (probe-file path))
+      (ensure-directories-exist path)
+      (dolist (table-one-path (directory (merge-pathnames (make-pathname :name :wild :type :wild) path)))
+        ()
+        ))))
+
+(defun load-table-manager ()
+  ()
+  )
+
+(defun add-table (name url attributes isNormal description b-path y-path)
   (vector-push 
-    (make-instance 'table :name name :url url :attributes attributes :isNormal isNormal :description description)
+    (make-instance 'table :name name :url url :attributes attributes :isNormal isNormal :description description :b-path b-path :y-path y-path)
    (gethash attributes *table-manager-hash*)))
 
 (defun remove-table (name attributes)
@@ -75,6 +86,11 @@
           :key #'(lambda (table-one) 
                            (table-name table-one)) 
           :test #'string=))
+
+(load-table-group "Video")
+(load-table-group "Music")
+(load-table-group "Game")
+(load-table-group "MMD")
 
 (in-package :cl-user)
 

@@ -22,7 +22,8 @@
 
 (defpackage :web-manager.file
   (:use :common-lisp :cl-events)
-  (:export :))
+  (:export :add-table
+           :remove-table))
 
 (defpackage :web-manager
   (:use :common-lisp :asdf :web-manager.aria2 :web-manager.file :cl-events :lparallel :bordeaux-threads)

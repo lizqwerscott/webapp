@@ -17,9 +17,14 @@
               "cl-json"
               "websocket-driver")
  :components ((:file "package")
+              (:module "file-manager"
+                :depends-on ("package")
+                :serial t
+                :components ((:file "file-manager")))
               (:module "aria2"
                 :depends-on ("package")
                 :serial t
                 :components ((:file "marco")
                              (:file "aria2" :depends-on ("marco"))))
               (:file "main" :depends-on ("package" "aria2"))))
+

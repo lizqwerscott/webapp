@@ -1,3 +1,4 @@
+(in-package :cl-user)
 (ql:quickload "asdf")
 
 (ql:quickload "cl-events") ;load event
