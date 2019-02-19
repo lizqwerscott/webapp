@@ -6,6 +6,8 @@
 (ql:quickload "cl-json") ;load json
 (ql:quickload "websocket-driver") ;load websocket
 
+(load "~/Documents/Learn/Lisp/TheWebApp/file-manager/file-manager.lisp")
+
 (load "./web-manager.asd")
 (asdf:operate 'asdf:load-op 'web-manager)
 

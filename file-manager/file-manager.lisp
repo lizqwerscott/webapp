@@ -60,31 +60,28 @@
   (run-shell (format nil "mv ~a ~a" b-path (table-b-path table-one)))
   (run-shell (format nil "mv ~a ~a" y-path (table-y-path table-one))))
 
-;(defmethod save-table ((table-one table))
-;  (let ((plist (list :name (table-name table-one) :path (table-path table-one) :b-path (table-b-path table-one) :y-path (table-y-path table-one) :url (table-url table-one) :attributes (table-attributes table-one) :date (table-date table-one) :come-from (table-come-from table-one) :description (table-description table-one))))
-    
-;    ))
-;(add-table "hello" "http://baidu.com" "Video" "LingMengYuShuo" "The test" "~/Documents/test-web/Downloads/test" "~/Documents/test-web/Downloads/test.rar")
+(defmethod save-table ((table-one table))
+  (let ((plist (list :name (table-name table-one) :path (table-path table-one) :b-path (table-b-path table-one) :y-path (table-y-path table-one) :url (table-url table-one) :attributes (table-attributes table-one) :date (table-date table-one) :come-from (table-come-from table-one) :description (table-description table-one))))
+    (with-open-file (out (merge-pathnames (make-pathname :name "info" :type "txt") (table-path table-one)) :direction :output :if-exists :supersede)
+      (with-standard-io-syntax 
+        (print plist out))) plist))
+
+;;;todo load-table
+(defmethod load-table ((table-one table)))
+
+(add-table "hello" "http://baidu.com" "Video" "LingMengYuShuo" "The test" "~/Documents/test-web/Downloads/test" "~/Documents/test-web/Downloads/test.rar")
 
 ;(vector-push-extend 'a (gethash "Video" *table-manager-hash*))
-;(setf (gethash "Video" *table-manager-hash*) (remove 'a (gethash "Video" *table-manager-hash*)))
+(setf (gethash "Video" *table-manager-hash*) (remove 'a (gethash "Video" *table-manager-hash*)))
 ;(setf (gethash "Video" *table-manager-hash*) (make-array 10 :fill-pointer 0 :adjustable t))
 
-;(remove-table "hello" "Video")
-;(save-table (find "hello" (gethash "Video" *table-manager-hash*) :test #'string= :key #'(lambda (table-one) (table-name table-one))))
-
-(defmethod save-table ((table-one table))
-  (with-open-file (out (merge-pathnames (make-pathname :name "info" :type "txt") (table-b-path table-one)) :direction :output :if-exists :supersede)
-    (with-standard-io-syntax
-      (print table-one out))))
+(remove-table "hello" "Video")
+(save-table (find "hello" (gethash "Video" *table-manager-hash*) :test #'string= :key #'(lambda (table-one) (table-name table-one))))
 
 (defmethod initialize-instance :after ((table-one table) &key b-path y-path)
   (make-table-dir table-one)
   (move-table table-one b-path y-path)
   (setf (table-date table-one) "2019.2.17.22:10"))
-
-(defmethod reinitialize-instance :before ((table-one table) &key)
-  (run-shell (format nil "rm -rf ~a" (namestring (table-path table-one))) t))
 
 (defun load-table-group (key)
   (setf (gethash key *table-manager-hash*) (make-array 10 :fill-pointer 0 :adjustable t))
@@ -106,8 +103,9 @@
    (gethash attributes *table-manager-hash*)))
 
 (defun remove-table (name attributes)
+  (run-shell (format nil "rm -rf ~a" (namestring (table-path (find name (gethash attributes *table-manager-hash*) :key #'(lambda (table-one) (table-name table-one)) :test #'string=)))) t)
   (setf (gethash attributes *table-manager-hash*) 
-        (remove name 
+        (delete name 
           (gethash attributes *table-manager-hash*) 
           :key #'(lambda (table-one) 
                            (table-name table-one)) 
