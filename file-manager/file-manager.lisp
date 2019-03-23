@@ -2,11 +2,6 @@
 ;;;;include a small database
 (in-package :web-manager.file)
 
-(defun run-shell (cmd &optional (isDebug-p nil))
-  (if isDebug-p 
-     (sb-ext:run-program "/bin/sh" (list "-c" cmd) :input nil :output *standard-output*)
-     (sb-ext:run-program "/bin/sh" (list "-c" cmd) :input nil :output nil)))
-
 (defvar *table-manager-hash* (make-hash-table :test #'equal))
 ;(defparameter *drive-path* "/mnt/myusbdrives/")
 (defparameter *drive-path* (make-pathname :directory '(:absolute :home "Documents" "test-web")))
@@ -18,11 +13,9 @@
    (path 
      :accessor table-path)
    (b-path
-     :accessor table-b-path
-     )
+     :accessor table-b-path)
    (y-path
-     :accessor table-y-path
-     )
+     :accessor table-y-path)
    (url
      :initarg :url
      :reader table-url)
@@ -56,9 +49,18 @@
     (setf (table-b-path table-one) (ensure-directories-exist (merge-pathnames (pathname (format nil "Ben/")) path)))
     (setf (table-path table-one) path)))
 
-(defmethod move-table ((table-one table) b-path y-path)
-  (run-shell (format nil "mv ~a ~a" b-path (table-b-path table-one)))
-  (run-shell (format nil "mv ~a ~a" y-path (table-y-path table-one))))
+(defmethod move-table ((table-one table) y-path)
+  (run-shell (format nil "mv ~a ~a" y-path (table-b-path table-one)))
+  ;(let ((y-now-path (format nil "~a" (namestring (merge-pathnames (let ((temppath (pathname y-path))) (pathname :name (pathname-name temppath) :type (pathname-type temppath))) (table-b-path table-one))))))
+  (let ((y-now-path 
+          (format nil "~a" (namestring 
+                             (merge-pathnames 
+                               (let ((temppath (pathname y-path)))
+                                 (make-pathname :name (pathname-name temppath) :type (pathname-type temppath))) 
+                               (table-b-path table-one))))))
+    (run-shell (format nil "cd ~a" (table-b-path table-one)))
+    (run-shell (format nil "unrar x ~a" y-now-path) t) ;Wait to test
+    (run-shell (format nil "mv ~a ~a" y-now-path (table-y-path table-one)))))
 
 (defmethod save-table ((table-one table))
   (let ((plist (list :name (table-name table-one) :path (table-path table-one) :b-path (table-b-path table-one) :y-path (table-y-path table-one) :url (table-url table-one) :attributes (table-attributes table-one) :date (table-date table-one) :come-from (table-come-from table-one) :description (table-description table-one))))
@@ -67,7 +69,7 @@
         (print plist out))) plist))
 
 
-;(add-table "hello" "http://baidu.com" "Video" "LingMengYuShuo" "The test" "~/Documents/test-web/Downloads/test" "~/Documents/test-web/Downloads/test.rar")
+;(add-table "hello" "http://baidu.com" "Video" "LingMengYuShuo" "The test" "~/Documents/test-web/Downloads/test.rar")
 
 ;(vector-push-extend 'a (gethash "Video" *table-manager-hash*))
 ;(setf (gethash "Video" *table-manager-hash*) (remove 'a (gethash "Video" *table-manager-hash*)))
@@ -77,10 +79,10 @@
 ;(remove-table "hello" "Video")
 ;(save-table (find "hello" (gethash "Video" *table-manager-hash*) :test #'string= :key #'(lambda (table-one) (table-name table-one))))
 
-(defmethod initialize-instance :after ((table-one table) &key loadp b-path y-path)
+(defmethod initialize-instance :after ((table-one table) &key loadp y-path)
   (when loadp 
     (make-table-dir table-one)
-    (move-table table-one b-path y-path)) 
+    (move-table table-one y-path)) 
   (setf (table-date table-one) "2019.2.17.22:10"))
 
 (defun load-table (path)
@@ -102,8 +104,8 @@
   (dolist (table-one-group (directory (merge-pathnames (make-pathname :name :wild :type :wild) *drive-path*)))
     (when (not (string= (car (last (pathname-directory table-one-group))) "Downloads")) (load-table-group table-one-group))))
 
-(defun add-table (name url attributes come-from description b-path y-path &optional (date nil))
-  (let (table-one (make-instance 'table :name name :url url :attributes attributes :come-from come-from :description description :b-path b-path :y-path y-path :date date :loadp t))
+(defun add-table (name url attributes come-from description y-path &optional (date nil))
+  (let ((table-one (make-instance 'table :name name :url url :attributes attributes :come-from come-from :description description :y-path y-path :date date :loadp t)))
     (vector-push table-one (gethash attributes *table-manager-hash*))
     (save-table table-one) table-one))
 
@@ -115,6 +117,11 @@
           :key #'(lambda (table-one) 
                            (table-name table-one)) 
           :test #'string=)))
+
+(defun search-table (name &optional (attributes "Video" attributes-supplied-p))
+  (if attributes-supplied-p
+     (find name (gethash attributes *table-manager-hash*) :test #'string= :key #'(lambda (table-one) (table-name table-one)))
+     (maphash #'(lambda (k v) (find name v :test #'string= :key #'(lambda (table-one (table-name table-one))))))))
 
 (load-table-manager)
 ;(load-table-group "Video")

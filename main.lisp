@@ -35,11 +35,22 @@
   	((name
     	:initarg :name
     	:initform (error "Must supply a task name")
-     	:reader name)
+     	:reader task-name)
      (url
        	:initarg :url
         :initform (error "Must supply a url")
-        :reader url)
+        :reader task-url)
+     (attributes 
+       :initarg attributes
+       :initform "Video"
+       :reader task-attributes)
+     (come-form 
+       :initarg come-from
+       :initform "LingMengYuShuo"
+       :reader task-come-form)
+     (description 
+       :initarg description
+       :reader task-description)
      (run-status
         :initarg :run-status
         :initform "download"
@@ -91,11 +102,11 @@
         ((not (and (string= "download" (run-status task-one)) (string= "complete" (get-task-download-info task-one :status)))) return-number)
         ;;update-all-task
         (update-download (task-download-file task-one))))
-  (setf (run-status task-one) "zip")
-  (format t "Run:Zip.~%")
-  (setf (run-status task-one) "move")
-  (format t "Run:Move~%")
-  
+  (run-shell (format nil "cd ~a" (gethash ":dir" (download-file task-one))))
+  (run-shell (format nil "unrar x ~a" (gethash ":files" (download-file task-one))))
+  (setf (run-status task-one) "logging")
+  (format t "Run:logging~%")
+  (add-table (task-name task-one) (task-url task-one) (task-attributes task-one) (task-come-form task-one) (task-description task-one) (download-file task-one))
   (format t "Run:")
   (format t "End:update-task:~a~%" (name task-one)))
 

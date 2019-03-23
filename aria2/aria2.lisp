@@ -52,7 +52,7 @@
      :reader download-url)
    (gid
      :accessor download-gid)
-   (all-data ;<:key, value> key::completed-length :dir :download-speed :files :gid :status :total-length
+   (all-data ;This is hash table <:key, value> key::completed-length :dir :download-speed :files :gid :status :total-length
      :accessor download-data)
    (status
      :initform "waiting"
