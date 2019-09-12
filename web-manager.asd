@@ -22,10 +22,9 @@
                 :depends-on ("package" "head")
                 :serial t
                 :components ((:file "file-manager")))
-              (:module "aria2"
-                :depends-on ("package")
+              (:module "download"
+                :depends-on ("package" "head")
                 :serial t
-                :components ((:file "marco")
-                             (:file "aria2" :depends-on ("marco"))))
-              (:file "main" :depends-on ("package" "aria2" "head"))))
+                :components ((:file "download")))
+              (:file "main" :depends-on ("package" "download" "head"))))
 

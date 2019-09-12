@@ -11,18 +11,9 @@
   (:use :common-lisp)
   (:export :run-shell))
 
-(defpackage :web-manager.aria2
-  (:use :common-lisp :cl-events :cl-json :websocket-driver)
-  (:export :update-download
-           :get-download-info
-           :remove-download
-           :pause-download
-           :unpause-download
-           :get-status
-           :download-object
-           :make-download
-           :get-connection-state
-           :restart-connect))
+(defpackage :web-manager.download
+  (:use :common-lisp :web-manager.head)
+  (:export :download))
 
 (defpackage :web-manager.file
   (:use :common-lisp :cl-events :web-manager.head)
@@ -31,7 +22,7 @@
            :search-table))
 
 (defpackage :web-manager
-  (:use :common-lisp :asdf :web-manager.aria2 :web-manager.file :cl-events :lparallel :bordeaux-threads :web-manager.head)
+  (:use :common-lisp :web-manager.head :web-manager.download :web-manager.file :cl-events :lparallel :bordeaux-threads)
   (:export :add-task
            :remove-task
            :task

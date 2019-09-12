@@ -120,8 +120,12 @@
 
 (defun search-table (name &optional (attributes "Video" attributes-supplied-p))
   (if attributes-supplied-p
-     (find name (gethash attributes *table-manager-hash*) :test #'string= :key #'(lambda (table-one) (table-name table-one)))
-     (maphash #'(lambda (k v) (find name v :test #'string= :key #'(lambda (table-one (table-name table-one))))))))
+     (find name (gethash attributes *table-manager-hash*) :test #'string= :key #'(lambda (table-one) 
+                                                                                   (table-name table-one)))
+     (maphash #'(lambda (k v) 
+                  (find name v :test #'string= :key #'(lambda (table-one)
+                                                                    (table-name table-one))))
+              *table-manager-hash*)))
 
 (load-table-manager)
 ;(load-table-group "Video")

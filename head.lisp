@@ -5,5 +5,5 @@
      (sb-ext:run-program "/bin/sh" (list "-c" cmd) :input nil :output *standard-output*)
      (sb-ext:run-program "/bin/sh" (list "-c" cmd) :input nil :output nil)))
 
-(in-package :common-lisp)
+(in-package :cl-user)
 

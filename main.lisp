@@ -102,11 +102,11 @@
         ((not (and (string= "download" (run-status task-one)) (string= "complete" (get-task-download-info task-one :status)))) return-number)
         ;;update-all-task
         (update-download (task-download-file task-one))))
-  (run-shell (format nil "cd ~a" (gethash ":dir" (download-file task-one))))
-  (run-shell (format nil "unrar x ~a" (gethash ":files" (download-file task-one))))
+  (run-shell (format nil "cd ~a" (gethash ":dir" (task-download-file task-one))))
+  (run-shell (format nil "unrar x ~a" (gethash ":files" (task-download-file task-one))))
   (setf (run-status task-one) "logging")
   (format t "Run:logging~%")
-  (add-table (task-name task-one) (task-url task-one) (task-attributes task-one) (task-come-form task-one) (task-description task-one) (download-file task-one))
+  (add-table (task-name task-one) (task-url task-one) (task-attributes task-one) (task-come-form task-one) (task-description task-one) (taks-download-file task-one))
   (format t "Run:")
   (format t "End:update-task:~a~%" (name task-one)))
 
