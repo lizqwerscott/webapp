@@ -1,7 +1,6 @@
 (in-package :web-manager.download)
 
-(defun download ()
-  (format t "download-all")
-  )
+(defun download (plist)
+  (format t "download-all~%") plist)
 
 (in-package :cl-user)

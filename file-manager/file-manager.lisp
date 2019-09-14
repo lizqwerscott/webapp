@@ -4,67 +4,53 @@
 
 (defvar *table-manager-hash* (make-hash-table :test #'equal))
 ;(defparameter *drive-path* "/mnt/myusbdrives/")
-(defparameter *drive-path* (make-pathname :directory '(:absolute :home "Documents" "test-web")))
+(defparameter *drive-path* (make-pathname :directory '(:absolute :home "test-web")))
 
 (defclass table ()
-  ((name 
-     :initarg :name
-     :reader table-name)
-   (path 
-     :accessor table-path)
-   (b-path
-     :accessor table-b-path)
-   (y-path
-     :accessor table-y-path)
-   (url
-     :initarg :url
-     :reader table-url)
-   (attributes
-     :initarg :attributes
-     :reader table-attributes)
+  ((id 
+     :initarg :id
+     :reader table-id)
+   (plist-info 
+     :initarg :pi
+     :initform (error "Must add the plist-info(tabel")
+     :accessor table-pi)
    (date
      :initarg :date
-     :accessor table-date)
-   (come-from
-     :initarg :come-from
-     :reader table-come-from)
-   (description
-     :initarg :description
-     :reader table-description)))
+     :accessor table-date)))
 
 ;;;A very big problem will to change
 ;(defmethod make-table-dir ((table-one table))
 ;  (let ((path (format nil "~a~a" *drive-path*  (table-attributes table-one))))
 ;    (if (table-isNormal table-one)
-;        (setf path (format nil "~a/Normal/~a" path (table-name table-one)))
-;        (setf path (format nil "~a/~a" path (table-name table-one))))
+;        (setf path (format nil "~a/Normal/~a" path (table-id table-one)))
+;        (setf path (format nil "~a/~a" path (table-id table-one))))
 ;    (run-shell (format nil "mkdir ~a/" path))
 ;    (run-shell (setf (table-y-path table-one) (format nil "mkdir ~a/Archive/" path)))
 ;    (run-shell (setf (table-b-path table-one) (format nil "mkdir ~a/Ben/" path)))
 ;    (setf (table-path table-one) path)))
 
 (defmethod make-table-dir ((table-one table))
-  (let ((path (merge-pathnames (pathname (format nil "~a/~a/~a/" (table-attributes table-one) (table-come-from table-one) (table-name table-one))) *drive-path*)))
-    (setf (table-y-path table-one) (ensure-directories-exist (merge-pathnames (pathname (format nil "Archive/")) path)))
-    (setf (table-b-path table-one) (ensure-directories-exist (merge-pathnames (pathname (format nil "Ben/")) path)))
-    (setf (table-path table-one) path)))
+  (let* ((tablepi (table-pi table-one)) (path (merge-pathnames (pathname (format nil "~a/~a/~a/" (getf tablepi :attributes) (getf tablepi :come-from) (table-id table-one))) *drive-path*)))
+    (setf (getf (table-pi table-one) :y-path) (ensure-directories-exist (merge-pathnames (pathname (format nil "Archive/")) path)))
+    (setf (getf (table-pi table-one) :b-path) (ensure-directories-exist (merge-pathnames (pathname (format nil "Ben/")) path)))
+    (setf (getf (table-pi table-one) :path) path)))
 
-(defmethod move-table ((table-one table) y-path)
-  (run-shell (format nil "mv ~a ~a" y-path (table-b-path table-one)))
-  ;(let ((y-now-path (format nil "~a" (namestring (merge-pathnames (let ((temppath (pathname y-path))) (pathname :name (pathname-name temppath) :type (pathname-type temppath))) (table-b-path table-one))))))
-  (let ((y-now-path 
-          (format nil "~a" (namestring 
-                             (merge-pathnames 
-                               (let ((temppath (pathname y-path)))
-                                 (make-pathname :name (pathname-name temppath) :type (pathname-type temppath))) 
-                               (table-b-path table-one))))))
-    (run-shell (format nil "cd ~a" (table-b-path table-one)))
-    (run-shell (format nil "unrar x ~a" y-now-path) t) ;Wait to test
-    (run-shell (format nil "mv ~a ~a" y-now-path (table-y-path table-one)))))
+;(defmethod move-table ((table-one table) y-path)
+;  (run-shell (format nil "mv ~a ~a" y-path (getf (table-pi table-one) :y-path)))
+  ;(let ((y-now-path (format nil "~a" (namestring (merge-pathnames (let ((temppath (pathname y-path))) (pathname :id (pathname-name temppath) :type (pathname-type temppath))) (table-b-path table-one))))))
+;  (let ((y-now-path 
+;          (format nil "~a" (namestring 
+;                             (merge-pathnames 
+                      ;         (let ((temppath (pathname y-path)))
+                               ;  (make-pathname :name (pathname-name temppath) :type (pathname-type temppath))) 
+                               ;(table-b-path table-one))))))
+    ;(run-shell (format nil "cd ~a" (table-b-path table-one)))
+    ;(run-shell (format nil "unrar x ~a" y-now-path) t) ;Wait to test
+    ;(run-shell (format nil "mv ~a ~a" y-now-path (getf (table-pi table-one) :y-path)))
 
 (defmethod save-table ((table-one table))
-  (let ((plist (list :name (table-name table-one) :path (table-path table-one) :b-path (table-b-path table-one) :y-path (table-y-path table-one) :url (table-url table-one) :attributes (table-attributes table-one) :date (table-date table-one) :come-from (table-come-from table-one) :description (table-description table-one))))
-    (with-open-file (out (merge-pathnames (make-pathname :name "info" :type "txt") (table-path table-one)) :direction :output :if-exists :supersede)
+  (let ((plist (table-pi table-one)))
+    (with-open-file (out (merge-pathnames (make-pathname :name "info" :type "txt") (getf (table-pi table-one) :path)) :direction :output :if-exists :supersede)
       (with-standard-io-syntax 
         (print plist out))) plist))
 
@@ -77,22 +63,22 @@
 
 ;(table-path (elt (gethash "Video" *table-manager-hash*) 0)) 
 ;(remove-table "hello" "Video")
-;(save-table (find "hello" (gethash "Video" *table-manager-hash*) :test #'string= :key #'(lambda (table-one) (table-name table-one))))
+;(save-table (find "hello" (gethash "Video" *table-manager-hash*) :test #'string= :key #'(lambda (table-one) (table-id table-one))))
 
-(defmethod initialize-instance :after ((table-one table) &key loadp y-path)
-  (when loadp 
+(defmethod initialize-instance :after ((table-one table) &key loadp)
+  (unless loadp 
     (make-table-dir table-one)
-    (move-table table-one y-path)) 
-  (setf (table-date table-one) "2019.2.17.22:10"))
+    (setf (table-date table-one) "2019.2.17.22:10")))
+    ;(move-table table-one y-path)) )
 
 (defun load-table (path)
+  (format t "load-table:path~A~%" path)
   (let* ((plist (with-open-file (in (merge-pathnames (make-pathname :name "info" :type "txt") path)) (with-standard-io-syntax (read in))))
-         (table-one (make-instance 'table :name (getf plist :name) :url (getf plist :url) :attributes (getf plist :attributes) :come-from (getf plist :come-from) :description (getf plist :description) :b-path (getf plist :b-path) :y-path (getf plist :y-path) :date (getf plist :date) :loadp nil)))
-    (setf (table-path table-one) (getf plist :path)) table-one))
+         (table-one (make-instance 'table :id (getf plist :id) :pi plist :date (getf plist :date) :loadp t)))
+    (setf (getf (table-pi table-one) :path) (getf plist :path)) table-one))
 
 (defun load-table-group (path)
-  (let* ((key (car (last (pathname-directory path))))
-        (table-group (gethash key *table-manager-hash*))) 
+  (let* ((key (car (last (pathname-directory path))))) 
     (setf (gethash key *table-manager-hash*) (make-array 10 :fill-pointer 0 :adjustable t))
     (if (not (probe-file path))
       (ensure-directories-exist path)
@@ -104,28 +90,39 @@
   (dolist (table-one-group (directory (merge-pathnames (make-pathname :name :wild :type :wild) *drive-path*)))
     (when (not (string= (car (last (pathname-directory table-one-group))) "Downloads")) (load-table-group table-one-group))))
 
-(defun add-table (name url attributes come-from description y-path &optional (date nil))
-  (let ((table-one (make-instance 'table :name name :url url :attributes attributes :come-from come-from :description description :y-path y-path :date date :loadp t)))
-    (vector-push table-one (gethash attributes *table-manager-hash*))
-    (save-table table-one) table-one))
+(defun add-table (plist-info &optional (date "nil"))
+  (let ((table-one (make-instance 'table :id (getf plist-info :id) :pi (append plist-info (list :date date :path nil)) :date date :loadp nil)))
+    (vector-push table-one (gethash (getf (table-pi table-one) :attributes) *table-manager-hash*))
+    (save-table table-one) (table-pi table-one)))
 
-(defun remove-table (name attributes)
-  (run-shell (format nil "rm -rf ~a" (namestring (table-path (find name (gethash attributes *table-manager-hash*) :key #'(lambda (table-one) (table-name table-one)) :test #'string=)))) t)
+(defun remove-table (id attributes)
+  (run-shell (format nil "rm -rf ~a" (namestring (getf (table-pi (find id (gethash attributes *table-manager-hash*) :key #'(lambda (table-one)
+                      (table-id table-one)) :test #'string=)) :path))) t)
   (setf (gethash attributes *table-manager-hash*) 
-        (delete name 
+        (delete id 
           (gethash attributes *table-manager-hash*) 
           :key #'(lambda (table-one) 
-                           (table-name table-one)) 
+                           (table-id table-one)) 
           :test #'string=)))
 
 (defun search-table (name &optional (attributes "Video" attributes-supplied-p))
   (if attributes-supplied-p
      (find name (gethash attributes *table-manager-hash*) :test #'string= :key #'(lambda (table-one) 
-                                                                                   (table-name table-one)))
+                                                                                   (table-id table-one)))
      (maphash #'(lambda (k v) 
+                  (format t "key:~A" k)
                   (find name v :test #'string= :key #'(lambda (table-one)
-                                                                    (table-name table-one))))
+                                                                    (table-id table-one))))
               *table-manager-hash*)))
+
+(defun show-table ()
+  (format t "Show Table:-------------~%")
+  (maphash #'(lambda (k v)
+               (format t "key:~A,length:~A~%" k (length v))
+               (doTimes (i (length v))
+                        (format t "id:~A~%" (getf (table-pi (elt v i)) :id))))
+           *table-manager-hash*)
+  (format t "End:--------------------~%"))
 
 (load-table-manager)
 ;(load-table-group "Video")

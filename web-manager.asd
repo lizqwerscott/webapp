@@ -26,5 +26,9 @@
                 :depends-on ("package" "head")
                 :serial t
                 :components ((:file "download")))
-              (:file "main" :depends-on ("package" "download" "head"))))
+              (:module "handle"
+                :depends-on ("package" "head") 
+                :serial t
+                :components ((:file "handle")))
+              (:file "main" :depends-on ("handle" "package" "download" "head"))))
 

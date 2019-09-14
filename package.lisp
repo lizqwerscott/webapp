@@ -19,10 +19,15 @@
   (:use :common-lisp :cl-events :web-manager.head)
   (:export :add-table
            :remove-table
-           :search-table))
+           :search-table
+           :show-table))
+
+(defpackage :web-manager.handle
+  (:use :common-lisp :web-manager.head)
+  (:export :handle))
 
 (defpackage :web-manager
-  (:use :common-lisp :web-manager.head :web-manager.download :web-manager.file :cl-events :lparallel :bordeaux-threads)
+  (:use :common-lisp :web-manager.head :web-manager.download :web-manager.file :web-manager.handle :cl-events :lparallel :bordeaux-threads)
   (:export :add-task
            :remove-task
            :task
@@ -32,6 +37,5 @@
            :get-task-download-info
            :show-task
            :show-list
-           :find-task
-           :run-manager))
+           :find-task))
 
