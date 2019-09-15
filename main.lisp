@@ -77,7 +77,7 @@
 (defmethod show-task ((task-one task))
   (format t "id:~a~%url:~a~%run-satatus:~a~%" 
           (slot-value task-one 'id) 
-          (slot-value task-one 'url) 
+          (getf (task-pi task-one) :url) 
           (slot-value task-one 'run-status)))
 
 (defmethod update-task ((task-one task))
@@ -90,7 +90,7 @@
 
 (defun show-list ()
   (doTimes (i (length *run-task-list*))
-   	(format t "[~a]:Start~%" (+ i 1))
+    (format t "[~a]:Start~%" (+ i 1))
     (show-task (elt *run-task-list* i))
     (format t "[~a]:End~%" (+ i 1))))
 
@@ -99,6 +99,7 @@
 
 ;;;About task some operating
 (defun add-task (plist-info)
+  "plist (:id :url :attributes :come-from :description :download-type)"
   (let ((task-one (make-instance 'task :id (getf plist-info :id) :pi plist-info)))
     (vector-push task-one *run-task-list*)
     (start-task task-one)))
