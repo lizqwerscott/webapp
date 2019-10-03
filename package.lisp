@@ -9,7 +9,11 @@
 
 (defpackage :web-manager.head
   (:use :common-lisp)
-  (:export :run-shell))
+  (:export :run-shell
+           :unrar-file
+           :unzip-file
+           :zip-file
+           :move-files))
 
 (defpackage :web-manager.download
   (:use :common-lisp :web-manager.head)
