@@ -21,10 +21,13 @@
 
 (defun move-files (files path)
   (format t "move~%")
-    (run-shell (format nil "mv ~A ~A" (namestring files) (namestring path)))
-    (if (not (pathname-name files)) 
-      (merge-pathnames (make-pathname :directory (car (last (pathname-directory files)))) path)
-      (merge-pathnames (make-pathname :name (pathname-name files) :type (pathname-type files)) path)))
+  (format t "files:~A||path:~A" (namestring files) (namestring path))
+  (run-shell (format nil "mv ~A ~A" (namestring files) (namestring path)))
+  (if (not (pathname-name files)) 
+     (merge-pathnames (make-pathname :directory (car (last (pathname-directory files)))) path)
+     (merge-pathnames (make-pathname :name (pathname-name files) :type (pathname-type files)) path)))
+
+;(defparameter *drive-path* (make-pathname :directory '(:absolute :home "test-web" "files")))
 
 (in-package :cl-user)
 

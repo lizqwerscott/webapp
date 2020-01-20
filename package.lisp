@@ -15,16 +15,17 @@
            :zip-file
            :move-files))
 
-(defpackage :web-manager.download
-  (:use :common-lisp :web-manager.head)
-  (:export :download))
-
 (defpackage :web-manager.file
   (:use :common-lisp :cl-events :web-manager.head)
   (:export :add-table
            :remove-table
            :search-table
-           :show-table))
+           :show-table
+           :get-drive-path))
+
+(defpackage :web-manager.download
+  (:use :common-lisp :web-manager.head :web-manager.file)
+  (:export :download))
 
 (defpackage :web-manager.handle
   (:use :common-lisp :web-manager.head)

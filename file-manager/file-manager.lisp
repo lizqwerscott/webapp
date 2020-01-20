@@ -4,7 +4,10 @@
 
 (defvar *table-manager-hash* (make-hash-table :test #'equal))
 ;(defparameter *drive-path* "/mnt/myusbdrives/")
-(defparameter *drive-path* (make-pathname :directory '(:absolute :home "test-web")))
+(defparameter *drive-path* (make-pathname :directory '(:absolute :home "test-web" "files")))
+
+(defun get-drive-path ()
+  *drive-path*)
 
 (defclass table ()
   ((id 
@@ -88,7 +91,8 @@
 
 (defun load-table-manager ()
   (dolist (table-one-group (directory (merge-pathnames (make-pathname :name :wild :type :wild) *drive-path*)))
-    (when (not (string= (car (last (pathname-directory table-one-group))) "Downloads")) (load-table-group table-one-group))))
+    (when (not (string= (car (last (pathname-directory table-one-group))) "Downloads")) 
+      (load-table-group table-one-group))))
 
 (defun add-table (plist-info &optional (date "nil"))
   (let ((table-one (make-instance 'table :id (getf plist-info :id) :pi (append plist-info (list :date date :path nil)) :date date :loadp nil)))
