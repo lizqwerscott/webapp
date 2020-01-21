@@ -3,11 +3,6 @@
 (in-package :web-manager.file)
 
 (defvar *table-manager-hash* (make-hash-table :test #'equal))
-;(defparameter *drive-path* "/mnt/myusbdrives/")
-(defparameter *drive-path* (make-pathname :directory '(:absolute :home "test-web" "files")))
-
-(defun get-drive-path ()
-  *drive-path*)
 
 (defclass table ()
   ((id 
@@ -33,7 +28,7 @@
 ;    (setf (table-path table-one) path)))
 
 (defmethod make-table-dir ((table-one table))
-  (let* ((tablepi (table-pi table-one)) (path (merge-pathnames (pathname (format nil "~a/~a/~a/" (getf tablepi :attributes) (getf tablepi :come-from) (table-id table-one))) *drive-path*)))
+  (let* ((tablepi (table-pi table-one)) (path (merge-pathnames (pathname (format nil "~a/~a/~a/" (getf tablepi :attributes) (getf tablepi :come-from) (table-id table-one))) (get-drive-path))))
     (setf (getf (table-pi table-one) :y-path) (ensure-directories-exist (merge-pathnames (pathname (format nil "Archive/")) path)))
     (setf (getf (table-pi table-one) :b-path) (ensure-directories-exist (merge-pathnames (pathname (format nil "Ben/")) path)))
     (setf (getf (table-pi table-one) :path) path)))
@@ -90,7 +85,7 @@
           (vector-push (load-table table-one-path) (gethash key *table-manager-hash*)))))))
 
 (defun load-table-manager ()
-  (dolist (table-one-group (directory (merge-pathnames (make-pathname :name :wild :type :wild) *drive-path*)))
+  (dolist (table-one-group (directory (merge-pathnames (make-pathname :name :wild :type :wild) (get-drive-path))))
     (when (not (string= (car (last (pathname-directory table-one-group))) "Downloads")) 
       (load-table-group table-one-group))))
 

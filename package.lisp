@@ -13,18 +13,18 @@
            :unrar-file
            :unzip-file
            :zip-file
-           :move-files))
+           :move-files
+           :get-drive-path))
 
 (defpackage :web-manager.file
   (:use :common-lisp :cl-events :web-manager.head)
   (:export :add-table
            :remove-table
            :search-table
-           :show-table
-           :get-drive-path))
+           :show-table))
 
 (defpackage :web-manager.download
-  (:use :common-lisp :web-manager.head :web-manager.file)
+  (:use :common-lisp :web-manager.head)
   (:export :download))
 
 (defpackage :web-manager.handle

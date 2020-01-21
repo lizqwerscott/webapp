@@ -3,7 +3,7 @@
 password="@"
 
 cd $2
-if [[ "$3" == " " ]] {
+if [[ "$3" == "nil" ]] {
   echo "only one, use default password"
   unrar x -p$password $1
 } else {
