@@ -23,7 +23,9 @@
   (run-shell (format nil "~A;~A" 
                      (format nil "cd ~A" (namestring path))
                      (do ((i 0 (+ i 1)) 
-                          (rc (format nil "zip -r -D ~A.zip" id) (format nil "~A ~A" rc (namestring (nth i files))))) 
+                          (rc (format nil "zip -r -D ~A.zip" id) (format nil "~A ~A" rc (if (pathname-type (nth i files))
+                                                                                            (format nil "./~A.~A" (pathname-name (nth i files)) (pathname-type (nth i files)))
+                                                                                            (format nil "./~A" (car (last (cdr (pathname-directory (nth i files)))))))))) 
                          ((= i (length files)) rc)
                          (format t "~A~%" rc))) t))
 
