@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-password="@"
+password="⑨"
 
 cd $2
 if [[ "$3" == "nil" ]] {

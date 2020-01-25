@@ -1,6 +1,6 @@
 (in-package :web-manager.head)
 
-;(defparameter *drive-path* "/mnt/myusbdrives/")
+;(defparameter *drive-path* "/mnt/myusbdrives/files")
 (defparameter *drive-path* (make-pathname :directory '(:absolute :home "test-web" "files")))
 
 (defun get-drive-path ()
