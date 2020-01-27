@@ -1,8 +1,5 @@
 (in-package :web-manager)
 
-(defun make-broadcast-event ()
-  (format nil "nil"))
-
 (defmethod initialize-instance :after ((task-one task) &key)
   (format t "Now run the process module~%"))
 

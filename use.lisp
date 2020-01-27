@@ -1,10 +1,11 @@
 (in-package :cl-user)
 (ql:quickload "asdf")
 
-(ql:quickload "cl-events") ;load event
-(ql:quickload "lparallel") ;load thread pool manager
+(ql:quickload "bordeaux-threads")
+;(ql:quickload "cl-events") ;load event
+;(ql:quickload "lparallel") ;load thread pool manager
 ;(ql:quickload "cl-json") ;load json
-(ql:quickload "websocket-driver") ;load websocket
+;(ql:quickload "websocket-driver") ;load websocket
 
 ;(load "~/Documents/Learn/Lisp/TheWebApp/file-manager/file-manager.lisp")
 ;(load "~/Documents/Learn/Lisp/TheWebApp/head.lisp")

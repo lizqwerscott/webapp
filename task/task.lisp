@@ -28,14 +28,7 @@
      (run-status
         :initarg :run-status
         :initform "download"
-        :accessor run-status)
-     ;;Event
-     (on-start 
-       :initform (make-broadcast-event)
-       :accessor task-on-start)
-     (on-pause
-       :initform (make-broadcast-event)
-       :accessor task-on-pause)))
+        :accessor run-status)))
 
 (defmethod pause-task ((task-one task))
   (setf (run-status task-one) "pause"))
