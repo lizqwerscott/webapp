@@ -12,6 +12,8 @@
 (load "./web-manager.asd")
 (asdf:operate 'asdf:load-op 'web-manager)
 
+
+
 (defun test-baidu ()
   (web-manager:add-task (list :id "baidu" :url "https://baidu.com" :attributes "Video" :come-from "test" :description "baidu" :download-type "common" :zipp t :password " ")))
 

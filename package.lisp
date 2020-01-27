@@ -42,5 +42,7 @@
            :get-task-download-info
            :show-task
            :show-list
-           :find-task))
+           :find-task
+           :update-task
+           :set-run-module))
 
