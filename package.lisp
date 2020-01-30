@@ -10,8 +10,11 @@
 (defpackage :web-manager.head
   (:use :common-lisp)
   (:export :run-shell
+           :get-directory
            :unrar-file
            :unzip-file
+           :un7z-file
+           :extract
            :zip-file
            :move-files
            :get-drive-path))

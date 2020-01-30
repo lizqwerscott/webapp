@@ -18,6 +18,21 @@
   (format t "file:~A;~%path:~A;~%password:~A;~%" file path password)
   (run-shell (format nil "./head/unzip-file.zsh ~A ~A ~A" file path password)))
 
+(defun un7z-file (file path password)
+  (run-shell (format nil "./head/un7z-file.zsh ~A ~A ~A" file path password)))
+
+(defun get-directory (file)
+  (let ((directory-string "/")) 
+    (dolist (i (cdr (pathname-directory file)))
+      (setf directory-string (format nil "~A~A/" directory-string i)))
+    directory-string))
+
+(defun extract (file dir password)
+  (cond ((string= "zip" (pathname-type file)) (unzip-file file dir password))
+        ((string= "rar" (pathname-type file)) (unrar-file file dir password))
+        ((string= "7z" (pathname-type file)) (un7z-file file dir password))
+        (t (format t "[ERROR]:the files type is error"))))
+
 (defun zip-file (files path id)
   (format t "zip-file-length:~A;~%" (length files))
   (run-shell (format nil "~A;~A" 
