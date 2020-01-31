@@ -11,8 +11,10 @@
            :un7z-file
            :extract
            :zip-file
+           :move-file
            :move-files
-           :get-drive-path))
+           :get-drive-path
+           :find-compressed))
 
 (defpackage :web-manager.file
   (:use :common-lisp :web-manager.head)
@@ -28,6 +30,10 @@
 (defpackage :web-manager.handle
   (:use :common-lisp :web-manager.head)
   (:export :handle))
+
+(defpackage :web-manager.arrange
+  (:use :common-lisp :web-manager.head)
+  (:export :arrange))
 
 (defpackage :web-manager
   (:use :common-lisp :web-manager.head :web-manager.download :web-manager.file :web-manager.handle :bordeaux-threads)

@@ -1,15 +1,5 @@
 (in-package :web-manager.handle)
 
-(defun find-compressed (path)
-  (let ((compressed-files ()) (no-compressed-files ()) (dir ()))
-    (dolist (file (directory (merge-pathnames (make-pathname :name :wild :type :wild) path)))
-      (if (and (not (pathname-type file)) (not (pathname-name file)))
-          (setf dir (append dir (list file)))
-          (let ((ft (pathname-type file))) 
-            (if (or (string= ft "zip") (string= ft "rar") (string= ft "7z"))
-                (setf compressed-files (append compressed-files (list file)))
-                (setf no-compressed-files (append no-compressed-files (list file)))))))
-    (list compressed-files (no-compressed) (dir))))
 
 (defun recursive-find-compressed-and-extract (path)
   (dolist (compressed (nth 0 (find-compressed path :dirp t)))
@@ -31,7 +21,7 @@
           (zip-file need-zip-files (getf plist-info :y-path) (getf plist-info :id)))
       (dolist (i directorys)
         (format t "movedir;~A~%" i)
-        (move-files i (getf plist-info :b-path)))))
+        (move-file i (getf plist-info :b-path)))))
   (recursive-find-compressed-and-extract (getf plist-info :b-path)))
 
 (defun handle (plist-info)

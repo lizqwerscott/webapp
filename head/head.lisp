@@ -44,13 +44,27 @@
                          ((= i (length files)) rc)
                          (format t "~A~%" rc))) t))
 
+(defun move-file (file path)
+  (format t "move files:~A||path:~A~%" (namestring file) (namestring path))
+  (run-shell (format nil "mv ~A ~A" (namestring file) (namestring path)))
+  (if (not (pathname-name file)) 
+     (merge-pathnames (make-pathname :directory (car (last (pathname-directory file)))) path)
+     (merge-pathnames (make-pathname :name (pathname-name file) :type (pathname-type file)) path)))
+
 (defun move-files (files path)
-  (format t "move~%")
-  (format t "files:~A||path:~A~%" (namestring files) (namestring path))
-  (run-shell (format nil "mv ~A ~A" (namestring files) (namestring path)))
-  (if (not (pathname-name files)) 
-     (merge-pathnames (make-pathname :directory (car (last (pathname-directory files)))) path)
-     (merge-pathnames (make-pathname :name (pathname-name files) :type (pathname-type files)) path)))
+  (dolist (i files)
+    (move-file i path)))
+
+(defun find-compressed (path)
+  (let ((compressed ()) (no-compressed ()) (dir ()))
+    (dolist (file (directory (merge-pathnames (make-pathname :name :wild :type :wild) path)))
+      (if (and (not (pathname-type file)) (not (pathname-name file)))
+          (setf dir (append dir (list file)))
+          (let ((ft (pathname-type file))) 
+            (if (or (string= ft "zip") (string= ft "rar") (string= ft "7z"))
+                (setf compressed (append compressed (list file)))
+                (setf no-compressed (append no-compressed (list file)))))))
+    (list compressed no-compressed dir)))
 
 ;(defparameter *drive-path* (make-pathname :directory '(:absolute :home "test-web" "files")))
 

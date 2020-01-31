@@ -13,7 +13,7 @@
     (format t "ss:~A~%" (namestring dir-name))
     (dolist (dir-file (directory (merge-pathnames (make-pathname :name :wild :type :wild) dir-name))) 
       (format t "~A~%" (namestring dir-file))
-      (move-files dir-file (getf plist :y-path))))
+      (move-file dir-file (getf plist :y-path))))
   (format t "download finish~%"))
 
 (defun download (plist)
