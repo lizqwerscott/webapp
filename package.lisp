@@ -2,11 +2,6 @@
 ;;;Load Pakage
 (in-package :cl-user)
 
-;(ql:quickload "cl-events") ;load event
-;(ql:quickload "lparallel") ;load thread pool manager
-;(ql:quickload "cl-json") ;load json
-;(ql:quickload "websocket-driver") ;load websocket
-
 (defpackage :web-manager.head
   (:use :common-lisp)
   (:export :run-shell
@@ -20,7 +15,7 @@
            :get-drive-path))
 
 (defpackage :web-manager.file
-  (:use :common-lisp :cl-events :web-manager.head)
+  (:use :common-lisp :web-manager.head)
   (:export :add-table
            :remove-table
            :search-table

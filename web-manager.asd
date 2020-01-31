@@ -12,10 +12,7 @@
  :licence "BSD sans advertising clause (see file COPYING for details)"
  :description "web-manager"
  :long-description "the download, zip and file manager."
- :depends-on ("cl-events"
-              "lparallel"
-              "cl-json"
-              "websocket-driver")
+ :depends-on ("bordeaux-threads")
  :components ((:file "package")
               (:module "head"
                 :serial t
