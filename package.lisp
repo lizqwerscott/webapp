@@ -36,7 +36,7 @@
   (:export :handle))
 
 (defpackage :web-manager
-  (:use :common-lisp :web-manager.head :web-manager.download :web-manager.file :web-manager.handle :bordeaux-threads)
+  (:use :common-lisp :web-manager.head :web-manager.download :web-manager.file :web-manager.handle :bordeaux-threads :web-manager.arrange)
   (:export :add-task
            :remove-task
            :task

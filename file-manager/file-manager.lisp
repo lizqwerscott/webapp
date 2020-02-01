@@ -123,9 +123,6 @@
            *table-manager-hash*)
   (format t "End:--------------------~%"))
 
-(arrange (get-drive-path))
-
-(load-table-manager)
 ;(load-table-group "Video")
 ;(load-table-group "Music")
 ;(load-table-group "Game")
