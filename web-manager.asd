@@ -17,8 +17,12 @@
               (:module "head"
                 :serial t
                 :components ((:file "head")))
-              (:module "file-manager"
+              (:module "arrange"
                 :depends-on ("package" "head")
+                :serial t
+                :components ((:file "arrange")))
+              (:module "file-manager"
+                :depends-on ("package" "head" "arrange)
                 :serial t
                 :components ((:file "file-manager")))
               (:module "download"
@@ -29,9 +33,5 @@
                 :depends-on ("package" "head") 
                 :serial t
                 :components ((:file "handle")))
-              (:module "arrange"
-                :depends-on ("package" "head")
-                :serial t
-                :components ((:file "arrange")))
               (:file "main" :depends-on ("handle" "package" "download" "head"))))
 

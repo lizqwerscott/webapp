@@ -16,8 +16,12 @@
            :get-drive-path
            :find-compressed))
 
-(defpackage :web-manager.file
+(defpackage :web-manager.arrange
   (:use :common-lisp :web-manager.head)
+  (:export :arrange))
+
+(defpackage :web-manager.file
+  (:use :common-lisp :web-manager.head :web-manager.arrange)
   (:export :add-table
            :remove-table
            :search-table
@@ -30,10 +34,6 @@
 (defpackage :web-manager.handle
   (:use :common-lisp :web-manager.head)
   (:export :handle))
-
-(defpackage :web-manager.arrange
-  (:use :common-lisp :web-manager.head)
-  (:export :arrange))
 
 (defpackage :web-manager
   (:use :common-lisp :web-manager.head :web-manager.download :web-manager.file :web-manager.handle :bordeaux-threads)
