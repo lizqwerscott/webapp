@@ -12,8 +12,8 @@
         (y-path (make-pathname :defaults (format nil "~AArchive/" (namestring dir)))) 
         (plist-info (create-plist-info dir b-path y-path come-from attributes)))
     (run-shell (format nil "cd ~A && mkdir Ben && mkdir Archive" dir))
-    (move-files (nth 0 files-dirs) b-path)
-    (move-files (append (nth 1 files-dirs) (nth 2 files-dirs)) y-path)
+    (move-files (nth 0 files-dirs) y-path)
+    (move-files (append (nth 1 files-dirs) (nth 2 files-dirs)) b-path)
     (with-open-file (out (format nil "~Ainfo.txt" (namestring dir)) :direction :output :if-exists :supersede)
       (with-standard-io-syntax
         (print plist-info out)))))
@@ -28,12 +28,19 @@
 
 (defun arrange (path) 
   (let ((attributess (nth 2 (find-compressed path))))
+    (format t "Path:~A~%" (namestring path))
     (dolist (attributes attributess) 
+      (format t "att:~A~%" (namestring attributes))
       (let ((come-froms (nth 2 (find-compressed attributes))))
         (dolist (come-from come-froms) 
+          (format t "--come:~A~%" (namestring come-from))
           (let ((dirs (nth 2 (find-compressed come-from))))
             (dolist (dir dirs) 
-              (handle-dir dir (get-directory-name come-from) (get-directory-name attributes)))))))))
+              (format t "----dir:~A~%" (namestring dir))
+              (handle-dir dir (get-directory-name come-from) (get-directory-name attributes))
+              ;(run-shell (format nil "sudo rm -rf ~AArchive && sudo rm -rf ~ABen" (namestring dir) (namestring dir)))
+              ;(run-shell (format nil "sudo rm -rf ~Ainfo.txt" (namestring dir)))
+              )))))))
 
 (in-package :cl-user)
 

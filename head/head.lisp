@@ -1,6 +1,6 @@
 (in-package :web-manager.head)
 
-(defparameter *drive-path* (make-pathname :defaults "/mnt/myusbdrives/files/"))
+(defparameter *drive-path* (make-pathname :defaults "/mnt/myusbdrive/files/"))
 ;(defparameter *drive-path* (make-pathname :directory '(:absolute :home "test-web" "files")))
 
 (defun get-drive-path ()
@@ -46,7 +46,7 @@
 
 (defun move-file (file path)
   (format t "move files:~A||path:~A~%" (namestring file) (namestring path))
-  (run-shell (format nil "mv ~A ~A" (namestring file) (namestring path)))
+  (run-shell (format nil "./head/move-file.zsh ~A ~A" (namestring file) (namestring path)))
   (if (not (pathname-name file)) 
      (merge-pathnames (make-pathname :directory (car (last (pathname-directory file)))) path)
      (merge-pathnames (make-pathname :name (pathname-name file) :type (pathname-type file)) path)))

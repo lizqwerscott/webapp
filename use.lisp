@@ -13,10 +13,11 @@
 (load "./web-manager.asd")
 (asdf:operate 'asdf:load-op 'web-manager)
 
-
-
 (defun test-baidu ()
   (web-manager:add-task (list :id "baidu" :url "https://baidu.com" :attributes "Video" :come-from "test" :description "baidu" :download-type "common" :zipp t :password " ")))
+
+(defun arrange-s ()
+  (web-manager.arrange:arrange (web-manager.head:get-drive-path)))
 
 (web-manager:set-run-module "process")
 
