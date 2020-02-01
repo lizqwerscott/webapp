@@ -18,7 +18,7 @@
 (defun test-baidu ()
   (web-manager:add-task (list :id "baidu" :url "https://baidu.com" :attributes "Video" :come-from "test" :description "baidu" :download-type "common" :zipp t :password " ")))
 
-(web-manager:set-run-module "thread")
+(web-manager:set-run-module "process")
 
 ;(web-manager:add-task (list :id "mo" :url "file://~/tets-web/Downlaod/" :attributes "Game" :come-from "mcbbs" :description "mcsever" :download-type "local" :zipp t :password "nil"))
 ;(web-manager:add-task "baidu" "http://baidu.com")
