@@ -22,7 +22,7 @@
                 :serial t
                 :components ((:file "arrange")))
               (:module "file-manager"
-                :depends-on ("package" "head" "arrange)
+                :depends-on ("package" "head" "arrange")
                 :serial t
                 :components ((:file "file-manager")))
               (:module "download"
