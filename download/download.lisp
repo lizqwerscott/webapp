@@ -1,10 +1,10 @@
 (in-package :web-manager.download)
 
 (defun download-baidu (plist)
-  (format t "download in baidu yun"))
+  (format t "download in baidu yun.ID:~A~%" (getf plist :id)))
 
 (defun download-common (plist)
-  (format t "download in common")
+  (format t "download in common~%")
   (run-shell (format nil "wget -P ~A ~A" (namestring (getf plist :y-path)) (getf plist :url)) t))
 
 (defun download-local (plist)

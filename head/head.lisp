@@ -1,7 +1,7 @@
 (in-package :web-manager.head)
 
-(defparameter *drive-path* (make-pathname :defaults "/mnt/myusbdrive/files/"))
-;(defparameter *drive-path* (make-pathname :directory '(:absolute :home "test-web" "files")))
+;(defparameter *drive-path* (make-pathname :defaults "/mnt/myusbdrive/files/"))
+(defparameter *drive-path* (make-pathname :directory '(:absolute :home "test-web" "files")))
 
 (defun get-drive-path ()
   *drive-path*)
@@ -44,9 +44,23 @@
                          ((= i (length files)) rc)
                          (format t "~A~%" rc))) t))
 
+(defun split-str (str char-s)
+  (let ((now (position char-s str)))
+    (if now 
+        (let ((str-b (subseq str 0 now))
+              (str-l (subseq str (+ now 1))))
+          (append (if (not (string= "" str-b)) (list str-b)) (split-str str-l char-s)))
+        (if (not (string= "" str)) (list str)))))
+
+(defun add-regular (str) 
+  (let* ((sp-str (split-str str #\Space)) (last-str (car sp-str))) 
+    (dolist (i (cdr sp-str))
+      (setf last-str (format nil "~A~:C ~A" last-str #\\ i)))
+    last-str))
+
 (defun move-file (file path)
   (format t "move files:~A||path:~A~%" (namestring file) (namestring path))
-  (run-shell (format nil "./head/move-file.zsh ~A ~A" (namestring file) (namestring path)))
+  (run-shell (format nil "mv ~A ~A" (add-regular (namestring file)) (add-regular (namestring path))) t)
   (if (not (pathname-name file)) 
      (merge-pathnames (make-pathname :directory (car (last (pathname-directory file)))) path)
      (merge-pathnames (make-pathname :name (pathname-name file) :type (pathname-type file)) path)))

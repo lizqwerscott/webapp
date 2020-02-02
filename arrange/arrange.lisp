@@ -7,16 +7,18 @@
     (list :path dir :b-path b-path :y-path y-path :id id :url "nil" :attributes attributes :come-from come-from :description id :download-type "local" :zipp t :password "nil")))
 
 (defun handle-dir (dir come-from attributes)
-  (let* ((files-dirs (find-compressed dir)) 
-        (b-path (make-pathname :defaults (format nil "~ABen/" (namestring dir))))
-        (y-path (make-pathname :defaults (format nil "~AArchive/" (namestring dir)))) 
-        (plist-info (create-plist-info dir b-path y-path come-from attributes)))
-    (run-shell (format nil "cd ~A && mkdir Ben && mkdir Archive" dir))
-    (move-files (nth 0 files-dirs) y-path)
-    (move-files (append (nth 1 files-dirs) (nth 2 files-dirs)) b-path)
-    (with-open-file (out (format nil "~Ainfo.txt" (namestring dir)) :direction :output :if-exists :supersede)
-      (with-standard-io-syntax
-        (print plist-info out)))))
+  (if (and (probe-file (merge-pathnames #P"Archive/" dir)) (probe-file (merge-pathnames #P"Ben/" dir)) (probe-file (merge-pathnames #P"info.txt" dir)))
+    (format t "Don't need to run~%")
+    (let* ((files-dirs (find-compressed dir)) 
+          (b-path (make-pathname :defaults (format nil "~ABen/" (namestring dir))))
+          (y-path (make-pathname :defaults (format nil "~AArchive/" (namestring dir)))) 
+          (plist-info (create-plist-info dir b-path y-path come-from attributes)))
+      (run-shell (format nil "cd ~A && mkdir Ben && mkdir Archive" dir))
+      (move-files (nth 0 files-dirs) y-path)
+      (move-files (append (nth 1 files-dirs) (nth 2 files-dirs)) b-path)
+      (with-open-file (out (format nil "~Ainfo.txt" (namestring dir)) :direction :output :if-exists :supersede)
+        (with-standard-io-syntax
+          (print plist-info out))))))
 
 ;;The .file and the vimrc will be the dir
 (defun get-directory-name (dir)
