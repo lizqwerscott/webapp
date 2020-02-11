@@ -19,9 +19,7 @@
       (if (= 0 (length need-zip-files)) 
           (format t "the need files-directory is null~%")
           (zip-file need-zip-files (getf plist-info :y-path) (getf plist-info :id)))
-      (dolist (i (append (nth 1 files-dirs) (nth 2 files-dirs)))
-        (format t "movedir;~A~%" i)
-        (move-file i (getf plist-info :b-path)))))
+      (move-files-or-dirs (append (nth 1 files-dirs) (nth 2 files-dirs)) (getf plist-info :b-path))))
   (recursive-find-compressed-and-extract (getf plist-info :b-path)))
 
 (defun handle (plist-info)

@@ -3,7 +3,7 @@
 (in-package :cl-user)
 
 (defpackage :web-manager.head
-  (:use :common-lisp)
+  (:use :common-lisp :uiop)
   (:export :run-shell
            :get-directory
            :unrar-file
@@ -13,6 +13,10 @@
            :zip-file
            :move-file
            :move-files
+           :move-dir
+           :move-dirs
+           :move-file-or-dir
+           :move-files-or-dirs
            :get-drive-path
            :find-compressed))
 

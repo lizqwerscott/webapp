@@ -44,23 +44,13 @@
                          ((= i (length files)) rc)
                          (format t "~A~%" rc))) t))
 
-(defun split-str (str char-s)
-  (let ((now (position char-s str)))
-    (if now 
-        (let ((str-b (subseq str 0 now))
-              (str-l (subseq str (+ now 1))))
-          (append (if (not (string= "" str-b)) (list str-b)) (split-str str-l char-s)))
-        (if (not (string= "" str)) (list str)))))
-
-(defun add-regular (str) 
-  (let* ((sp-str (split-str str #\Space)) (last-str (car sp-str))) 
-    (dolist (i (cdr sp-str))
-      (setf last-str (format nil "~A~:C ~A" last-str #\\ i)))
-    last-str))
 
 (defun move-file (file path)
   (format t "move files:~A||path:~A~%" (namestring file) (namestring path))
-  (run-shell (format nil "mv ~A ~A" (add-regular (namestring file)) (add-regular (namestring path))) t)
+  (if (pathname-name file)
+      (rename-file-overwriting-target file (merge-pathnames (make-pathname :name (pathname-name file) :type (pathname-type file)) path))
+      (format t "Not is the file"))
+  ;(run-shell (format nil "./head/move-file.zsh \"~A\" \"~A\"" (namestring file) (namestring path)) t)
   (if (not (pathname-name file)) 
      (merge-pathnames (make-pathname :directory (car (last (pathname-directory file)))) path)
      (merge-pathnames (make-pathname :name (pathname-name file) :type (pathname-type file)) path)))
@@ -68,6 +58,28 @@
 (defun move-files (files path)
   (dolist (i files)
     (move-file i path)))
+
+(defun move-dir (dir path)
+  (let ((new-path (make-pathname :directory (append (pathname-directory path) (last (pathname-directory dir))))) 
+        (files-dirs (find-compressed dir))) 
+    (ensure-directories-exist new-path)
+    (move-files (append (nth 0 files-dirs) (nth 1 files-dirs)) new-path)
+    (if (nth 2 files-dirs)
+        (move-dirs (nth 2 files-dirs) new-path)))
+  (delete-empty-directory dir))
+
+(defun move-dirs (dirs path)
+  (dolist (i dirs)
+    (move-dir i path)))
+
+(defun move-file-or-dir (file-or-path target)
+  (if (and (pathname-name file-or-path) (pathname-type file-or-path))
+      (move-file file-or-path target)
+      (move-dir file-or-path target)))
+
+(defun move-files-or-dirs (files-or-dirs target)
+  (dolist (i files-or-dirs)
+    (move-file-or-dir i target)))
 
 (defun find-compressed (path)
   (let ((compressed ()) (no-compressed ()) (dir ()))
