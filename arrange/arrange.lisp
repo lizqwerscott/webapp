@@ -15,7 +15,7 @@
           (plist-info (create-plist-info dir b-path y-path come-from attributes)))
       (run-shell (format nil "cd ~A && mkdir Ben && mkdir Archive" dir))
       (move-files (nth 0 files-dirs) y-path)
-      (move-files (append (nth 1 files-dirs) (nth 2 files-dirs)) b-path)
+      (move-files-or-dirs (append (nth 1 files-dirs) (nth 2 files-dirs)) b-path)
       (with-open-file (out (format nil "~Ainfo.txt" (namestring dir)) :direction :output :if-exists :supersede)
         (with-standard-io-syntax
           (print plist-info out))))))
