@@ -11,15 +11,22 @@
      (sb-ext:run-program "/bin/sh" (list "-c" cmd) :input nil :output *standard-output*)
      (sb-ext:run-program "/bin/sh" (list "-c" cmd) :input nil :output nil)))
 
+(defun default-password-p (password) 
+  (if (string= "nil" password) "⑨" password))
+
 (defun unrar-file (file path password)
-  (run-shell (format nil "./head/unrar-file.zsh ~A ~A ~A" file path password) t))
+  (uiop:with-current-directory (path) 
+    (sb-ext:run-program "/usr/bin/unrar" (list "x" (format nil "-p~A" (default-password-p password)) (namestring file)) :input nil :output *standard-output*)))
+  ;(run-shell (format nil "./head/unrar-file.zsh ~A ~A ~A" file path password) t)
 
 (defun unzip-file (file path password)
   (format t "file:~A;~%path:~A;~%password:~A;~%" file path password)
-  (run-shell (format nil "./head/unzip-file.zsh ~A ~A ~A" file path password)))
+  (with-current-directory (path)
+    (sb-ext:run-program "/usr/bin/unzip" (list (namestring file) (format nil "-P~A" (default-password-p password))) :input nil :output *standard-output*)))
 
 (defun un7z-file (file path password)
-  (run-shell (format nil "./head/un7z-file.zsh ~A ~A ~A" file path password)))
+  (with-current-directory (path)
+    (sb-ext:run-program "/usr/bin/7z" (list "x" (namestring file) (format nil "-p~A" (default-password-p password))) :input nil :output *standard-output*)))
 
 (defun get-directory (file)
   (let ((directory-string "/")) 
@@ -35,15 +42,12 @@
 
 (defun zip-file (files path id)
   (format t "zip-file-length:~A;~%" (length files))
-  (run-shell (format nil "~A;~A" 
-                     (format nil "cd ~A" (namestring path))
-                     (do ((i 0 (+ i 1)) 
-                          (rc (format nil "zip -r -D ~A.zip" id) (format nil "~A ~A" rc (if (pathname-type (nth i files))
-                                                                                            (format nil "./~A.~A" (pathname-name (nth i files)) (pathname-type (nth i files)))
-                                                                                            (format nil "./~A" (car (last (cdr (pathname-directory (nth i files)))))))))) 
-                         ((= i (length files)) rc)
-                         (format t "~A~%" rc))) t))
-
+  (uiop:with-current-directory (path)
+    (format t "NowPath:~A~%" (namestring (uiop:getcwd)))
+    (sb-ext:run-program "/usr/bin/zip" (append (list "-r" "-D" (format nil "~A.zip" id)) (mapcar #'(lambda (x)
+                                                                                                     (if (and (pathname-type x) (pathname-name x))
+                                                                                                         (format nil "./~A.~A" (pathname-name x) (pathname-type x))
+                                                                                                         (format nil "./~A" (car (last (cdr (pathname-directory x))))))) files)) :input nil :output *standard-output*)))
 
 (defun move-file (file path)
   (format t "move files:~A||path:~A~%" (namestring file) (namestring path))
