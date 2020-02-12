@@ -21,7 +21,8 @@
 (defun arrange-s ()
   (web-manager.arrange:arrange (web-manager.head:get-drive-path)))
 
-(web-manager:set-run-module "process")
+(defun srmp () 
+  (web-manager:set-run-module "process"))
 
 ;(web-manager:add-task (list :id "mo" :url "file://~/tets-web/Downlaod/" :attributes "Game" :come-from "mcbbs" :description "mcsever" :download-type "local" :zipp t :password "nil"))
 ;(web-manager:add-task "baidu" "http://baidu.com")
