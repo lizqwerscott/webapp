@@ -123,10 +123,11 @@
            *table-manager-hash*)
   (format t "End:--------------------~%"))
 
-(load-table-group "Video")
+;(load-table-group "Video")
 ;(load-table-group "Music")
 ;(load-table-group "Game")
 ;(load-table-group "MMD")
+(load-table-manager)
 
 (in-package :cl-user)
 
