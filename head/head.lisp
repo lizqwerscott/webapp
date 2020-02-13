@@ -16,7 +16,7 @@
 
 (defun unrar-file (file path password)
   (format t "file:~A;~%path:~A;~%password:~A;~%" file path password)
-  (uiop:with-current-directory (path) 
+  (with-current-directory (path) 
     (sb-ext:run-program "/usr/bin/unrar" (list "x" (format nil "-p~A" (default-password-p password)) (namestring file)) :input nil :output *standard-output*)))
   ;(run-shell (format nil "./head/unrar-file.zsh ~A ~A ~A" file path password) t)
 
