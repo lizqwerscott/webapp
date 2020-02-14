@@ -27,8 +27,8 @@
 (defpackage :web-manager.file
   (:use :common-lisp :uiop :web-manager.head :web-manager.arrange)
   (:export :table
+           :add-table
            :remove-table
-           :table
            :search-table
            :show-table))
 
