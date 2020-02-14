@@ -11,7 +11,7 @@
   (format t "download in local~%")
   (let ((dir-name (make-pathname :directory (append (pathname-directory (get-drive-path)) '("..") '("Download") `(,(getf plist :id))))))
     (format t "ss:~A~%" (namestring dir-name))
-    (dolist (dir-file (directory (merge-pathnames (make-pathname :name :wild :type :wild) dir-name))) 
+    (dolist (dir-file (directory* (merge-pathnames (make-pathname :name :wild :type :wild) dir-name))) 
       (format t "download:Move-file:~A~%" (namestring dir-file))
       (move-file-or-dir dir-file (getf plist :y-path)))
     (delete-empty-directory dir-name))

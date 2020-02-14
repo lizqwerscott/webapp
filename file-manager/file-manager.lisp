@@ -84,12 +84,12 @@
     (setf (gethash key *table-manager-hash*) (make-array 10 :fill-pointer 0 :adjustable t))
     (if (not (probe-file path))
       (ensure-directories-exist path)
-      (dolist (table-come-path (directory (merge-pathnames (make-pathname :name :wild :type :wild) path)))
-        (dolist (table-one-path (directory (merge-pathnames (make-pathname :name :wild :type :wild) table-come-path))) 
+      (dolist (table-come-path (directory* (merge-pathnames (make-pathname :name :wild :type :wild) path)))
+        (dolist (table-one-path (directory* (merge-pathnames (make-pathname :name :wild :type :wild) table-come-path))) 
           (vector-push-extend (load-table table-one-path) (gethash key *table-manager-hash*)))))))
 
 (defun load-table-manager ()
-  (dolist (table-one-group (directory (merge-pathnames (make-pathname :name :wild :type :wild) (get-drive-path))))
+  (dolist (table-one-group (directory* (merge-pathnames (make-pathname :name :wild :type :wild) (get-drive-path))))
     (when (not (string= (car (last (pathname-directory table-one-group))) "Downloads")) 
       (load-table-group table-one-group))))
 

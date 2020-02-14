@@ -91,7 +91,7 @@
 
 (defun find-compressed (path)
   (let ((compressed ()) (no-compressed ()) (dir ()))
-    (dolist (file (directory (merge-pathnames (make-pathname :name :wild :type :wild) path)))
+    (dolist (file (directory* (merge-pathnames (make-pathname :name :wild :type :wild) path)))
       (if (and (not (pathname-type file)) (not (pathname-name file)))
           (setf dir (append dir (list file)))
           (let ((ft (pathname-type file))) 
