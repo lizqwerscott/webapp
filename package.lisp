@@ -28,6 +28,7 @@
   (:use :common-lisp :uiop :web-manager.head :web-manager.arrange)
   (:export :table
            :remove-table
+           :table
            :search-table
            :show-table))
 

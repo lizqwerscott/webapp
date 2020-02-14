@@ -69,9 +69,13 @@
     (setf (table-date table-one) "2019.2.17.22:10")))
     ;(move-table table-one y-path)) )
 
+(defmethod sort-out ((table-one table))
+  ())
+
 (defun load-table (path)
   (format t "load-table:path~A~%" path)
-  (let* ((plist (with-open-file (in (merge-pathnames (make-pathname :name "info" :type "txt") path)) (with-standard-io-syntax (read in))))
+  (let* ((plist (with-open-file (in (merge-pathnames (make-pathname :name "info" :type "txt") path)) 
+                  (with-standard-io-syntax (read in))))
          (table-one (make-instance 'table :id (getf plist :id) :pi plist :date (getf plist :date) :loadp t)))
     (setf (getf (table-pi table-one) :path) (getf plist :path)) table-one))
 
@@ -82,7 +86,7 @@
       (ensure-directories-exist path)
       (dolist (table-come-path (directory (merge-pathnames (make-pathname :name :wild :type :wild) path)))
         (dolist (table-one-path (directory (merge-pathnames (make-pathname :name :wild :type :wild) table-come-path))) 
-          (vector-push (load-table table-one-path) (gethash key *table-manager-hash*)))))))
+          (vector-push-extend (load-table table-one-path) (gethash key *table-manager-hash*)))))))
 
 (defun load-table-manager ()
   (dolist (table-one-group (directory (merge-pathnames (make-pathname :name :wild :type :wild) (get-drive-path))))
@@ -91,7 +95,7 @@
 
 (defun add-table (plist-info &optional (date "nil"))
   (let ((table-one (make-instance 'table :id (getf plist-info :id) :pi (append plist-info (list :date date :path nil)) :date date :loadp nil)))
-    (vector-push table-one (gethash (getf (table-pi table-one) :attributes) *table-manager-hash*))
+    (vector-push-extend table-one (gethash (getf (table-pi table-one) :attributes) *table-manager-hash*))
     (save-table table-one) (table-pi table-one)))
 
 (defun remove-table (id attributes)
