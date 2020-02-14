@@ -15,6 +15,12 @@
 (defgeneric unpause-task (task-one)
   (:documentation "unpause-task"))
 
+(defgeneric update-task (task-one)
+  (:documentation "finish the task"))
+
+(defun get-thread-name ()
+  (thread-name (current-thread)))
+
 ;;;The Task class
 (defclass task ()
     ((id
@@ -29,6 +35,22 @@
         :initarg :run-status
         :initform "download"
         :accessor run-status)))
+
+(defmethod initialize-instance :after ((task-one task) &key)
+  (format t "Now run the thread module~%"))
+
+(defmethod start-task ((task-one task))
+  (make-thread (lambda () (update-task task-one)) :name "thread1"))
+ 
+(defmethod update-task ((task-one task))
+  (format t "RUn:thread name:~A~%" (get-thread-name))
+  (format t "Run:update-task:~a~%" (task-id task-one))
+  (handle (download (add-table (task-pi task-one))))
+  (setf (run-status task-one) "logging")
+  (format t "Run:logging~%")
+  (format t "Run:")
+  (format t "End:update-task:~a~%" (task-id task-one)))
+ 
 
 (defmethod pause-task ((task-one task))
   (setf (run-status task-one) "pause"))

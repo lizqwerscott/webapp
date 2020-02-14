@@ -95,7 +95,7 @@
     (save-table table-one) (table-pi table-one)))
 
 (defun remove-table (id attributes)
-  (run-shell (format nil "rm -rf ~a" (namestring (getf (table-pi (find id (gethash attributes *table-manager-hash*) :key #'(lambda (table-one)
+  (run-shell (format nil "rm -rf ~a" (unix-namestring (getf (table-pi (find id (gethash attributes *table-manager-hash*) :key #'(lambda (table-one)
                       (table-id table-one)) :test #'string=)) :path))) t)
   (setf (gethash attributes *table-manager-hash*) 
         (delete id 

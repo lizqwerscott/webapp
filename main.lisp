@@ -4,8 +4,6 @@
 
 (in-package :web-manager)
 
-(load "./task/task.lisp")
-
 ;;;The list of task
 (defparameter *run-task-list* (make-array 5 :fill-pointer 0 :adjustable t) "The Run task List")
 ;(defparameter *finish-task-list* (make-array 5 :fill-pointer 0 :adjustable t) "The Finish task List")
@@ -29,13 +27,6 @@
 
 (defun remove-task (id)
   (setf *run-task-list* (remove id *run-task-list* :key #'task-id :test #'string=)))
-
-(defun set-run-module (module)
-  (if (string= module "thread")
-      (load "./main-thread.lisp")
-      (if (string= module "process")
-          (load "./main-process.lisp")
-          (format t "[ERROR]:input error~%"))))
 
 (in-package :cl-user)
 

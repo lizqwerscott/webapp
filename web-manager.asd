@@ -33,5 +33,9 @@
                 :depends-on ("package" "head") 
                 :serial t
                 :components ((:file "handle")))
-              (:file "main" :depends-on ("handle" "package" "download" "head"))))
+              (:module "task"
+                :depends-on ("package" "head")
+                :serial t
+                :components ((:file "task")))
+              (:file "main" :depends-on ("handle" "package" "download" "head" "task"))))
 

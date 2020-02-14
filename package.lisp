@@ -25,14 +25,14 @@
   (:export :arrange))
 
 (defpackage :web-manager.file
-  (:use :common-lisp :web-manager.head :web-manager.arrange)
+  (:use :common-lisp :uiop :web-manager.head :web-manager.arrange)
   (:export :add-table
            :remove-table
            :search-table
            :show-table))
 
 (defpackage :web-manager.download
-  (:use :common-lisp :web-manager.head)
+  (:use :common-lisp :uiop :web-manager.head)
   (:export :download))
 
 (defpackage :web-manager.handle
@@ -51,6 +51,5 @@
            :show-task
            :show-list
            :find-task
-           :update-task
-           :set-run-module))
+           :update-task))
 
