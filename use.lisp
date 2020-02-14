@@ -1,4 +1,7 @@
 (in-package :cl-user)
+#+clozure 
+(load "/home/pi/quicklisp/setup.lisp")
+#+sbcl
 (ql:quickload "asdf")
 
 (ql:quickload "bordeaux-threads")
