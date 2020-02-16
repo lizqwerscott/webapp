@@ -25,6 +25,24 @@
     (vector-push task-one *run-task-list*)
     (start-task task-one)))
 
+(defun prompt-read (prompt)
+  (format t "Input-~A:")
+  (force-output *query-io*)
+  (read-line *query-io*))
+
+(defun prompt-switch (prompt switchs) 
+  (format t "Input-~A:~%"))
+
+(defun prompt-for-task ()
+  (add-task (list :id (prompt-read "Name") 
+                  :url (prompt-read "Url") 
+                  :attributes (prompt-read "Attributes")
+                  :come-from (prompt-read "Come-from")
+                  :description (prompt-read "Description")
+                  :download-type (prompt-read "Download-type")
+                  
+                  )))
+
 (defun remove-task (id)
   (setf *run-task-list* (remove id *run-task-list* :key #'task-id :test #'string=)))
 
