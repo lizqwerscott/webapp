@@ -20,28 +20,24 @@
 
 ;;;About task some operating
 (defun add-task (plist-info)
-  "plist (:id :url :attributes :come-from :description :download-type)"
+  "plist (:id :url :attributes :come-from :description :download-type :zippt :password)"
   (let ((task-one (make-instance 'task :id (getf plist-info :id) :pi plist-info)))
     (vector-push task-one *run-task-list*)
     (start-task task-one)))
 
-(defun prompt-read (prompt)
-  (format t "Input-~A:")
-  (force-output *query-io*)
-  (read-line *query-io*))
+(defun prompt-for-task-list ()
+  (list :id (prompt-read "Name") 
+        :url (prompt-read "Url") 
+        :attributes (want-to-self-input "Attributes" (list "Video"))
+        :come-from (want-to-self-input "Come-from" (list "MS" "YY" "LingMeiYushuo"))
+        :description (prompt-read "Description")
+        :download-type (want-to-self-input "Download-type" (list "local" "common" "baidu"))
+        :zippt (y-or-n-p "Do you want to zip")
+        :password (want-to-self-input "Password" (list "nil"))))
 
-(defun prompt-switch (prompt switchs) 
-  (format t "Input-~A:~%"))
-
-(defun prompt-for-task ()
-  (add-task (list :id (prompt-read "Name") 
-                  :url (prompt-read "Url") 
-                  :attributes (prompt-read "Attributes")
-                  :come-from (prompt-read "Come-from")
-                  :description (prompt-read "Description")
-                  :download-type (prompt-read "Download-type")
-                  
-                  )))
+(defun pfts ()
+  (loop (add-task (prompt-for-task-list))
+        (if (not (y-or-n-p "Dow you want to continue?")) (return))))
 
 (defun remove-task (id)
   (setf *run-task-list* (remove id *run-task-list* :key #'task-id :test #'string=)))

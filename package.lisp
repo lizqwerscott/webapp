@@ -18,7 +18,11 @@
            :move-file-or-dir
            :move-files-or-dirs
            :get-drive-path
-           :find-compressed))
+           :find-compressed
+           :prompt-read
+           :prompt-read-number
+           :prompt-switch
+           :want-to-self-input))
 
 (defpackage :web-manager.arrange
   (:use :common-lisp :web-manager.head)
@@ -43,6 +47,8 @@
 (defpackage :web-manager
   (:use :common-lisp :web-manager.head :web-manager.download :web-manager.file :web-manager.handle :bordeaux-threads :web-manager.arrange)
   (:export :add-task
+           :prompt-for-task-list
+           :pfts
            :remove-task
            :task
            :start-task

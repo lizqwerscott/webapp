@@ -101,7 +101,30 @@
                 (setf no-compressed (append no-compressed (list file)))))))
     (list compressed no-compressed dir)))
 
-;(defparameter *drive-path* (make-pathname :directory '(:absolute :home "test-web" "files")))
+(defun prompt-read (prompt)
+  (format t "Input-~A:" prompt)
+  (force-output *query-io*)
+  (read-line *query-io*))
+
+(defun prompt-read-number (prompt)
+  (or (parse-integer (prompt-read prompt) :junk-allowed t) 0))
+
+(defun prompt-switch (prompt switchs) 
+  (format t "Input-~A:~%" prompt)
+  (format t "Switch:")
+  (do ((i 1 (+ i 1))
+       (iterm switchs (cdr iterm)))
+      ((= i (+ (length switchs) 1)) 'done)
+      (format t " [~A]~A " i (car iterm)))
+  (format t "~%")
+  (elt switchs 
+       (do ((input (prompt-read-number "Number") (prompt-read-number "Number")))
+           ((and (>= input 0) (<= input (length switchs))) (- input 1)))))
+
+(defun want-to-self-input (prompt &optional (switchs nil))
+  (if (y-or-n-p (format nil "Do you want to chose ~A" prompt))
+      (prompt-switch prompt switchs)
+      (prompt-read prompt)))
 
 (in-package :cl-user)
 
