@@ -18,7 +18,9 @@
            :move-file-or-dir
            :move-files-or-dirs
            :get-drive-path
+           :directory-e
            :find-compressed
+           :empty-dirp
            :prompt-read
            :prompt-read-number
            :prompt-switch
@@ -31,10 +33,12 @@
 (defpackage :web-manager.file
   (:use :common-lisp :uiop :web-manager.head :web-manager.arrange)
   (:export :table
+           :check-table
            :add-table
            :remove-table
            :search-table
-           :show-table))
+           :show-table
+           :check-all-table))
 
 (defpackage :web-manager.download
   (:use :common-lisp :uiop :web-manager.head)

@@ -1,7 +1,7 @@
 (in-package :web-manager.head)
 
 (defparameter *drive-path* (make-pathname :defaults "/mnt/myusbdrive/files/"))
-;(defparameter *drive-path* (make-pathname :directory '(:absolute :home "test-web" "files")))
+;(defparameter *drive-path* (make-pathname :directory '(:absolute "home" "lizqwer" "test-web" "files")))
 
 (defun get-drive-path ()
   *drive-path*)
@@ -90,9 +90,14 @@
   (dolist (i files-or-dirs)
     (move-file-or-dir i target)))
 
+(defun directory-e (dir)
+  (if (not (and (pathname-type dir) (pathname-name dir))) 
+      (uiop:directory* (merge-pathnames (make-pathname :name :wild :type :wild) dir))
+      (error "var is not a dir")))
+
 (defun find-compressed (path)
   (let ((compressed ()) (no-compressed ()) (dir ()))
-    (dolist (file (directory* (merge-pathnames (make-pathname :name :wild :type :wild) path)))
+    (dolist (file (directory-e path))
       (if (and (not (pathname-type file)) (not (pathname-name file)))
           (setf dir (append dir (list file)))
           (let ((ft (pathname-type file))) 
@@ -100,6 +105,9 @@
                 (setf compressed (append compressed (list file)))
                 (setf no-compressed (append no-compressed (list file)))))))
     (list compressed no-compressed dir)))
+
+(defun empty-dirp (dir)
+  (if (directory-e dir) t nil))
 
 (defun prompt-read (prompt)
   (format t "Input-~A:" prompt)
