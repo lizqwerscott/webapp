@@ -20,7 +20,7 @@
 
 ;;;About task some operating
 (defun add-task (plist-info)
-  "plist (:id :url :attributes :come-from :description :download-type :zipp :password)"
+  "plist (:id :url :attributes :come-from :description :download-type :zipp :extractp :password)"
   (let ((task-one (make-instance 'task :id (getf plist-info :id) :pi plist-info)))
     (vector-push task-one *run-task-list*)
     (start-task task-one)))
@@ -32,7 +32,8 @@
         :come-from (want-to-self-input "Come-from" (list "MS" "YY" "LingMeiYushuo"))
         :description (prompt-read "Description")
         :download-type (want-to-self-input "Download-type" (list "local" "common" "baidu"))
-        :zipp (y-or-n-p "Do you want to zip")
+        :zipp (y-or-n-p "Do you want to zip?")
+        :extractp (y-or-n-p "Do you want to extract?")
         :password (want-to-self-input "Password" (list "nil"))))
 
 (defun pfts ()

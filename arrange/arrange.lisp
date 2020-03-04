@@ -4,7 +4,7 @@
   (let* ((directory-dir (pathname-directory dir))
          (l (length directory-dir))
          (id (nth (- l 1) directory-dir)))
-    (list :path dir :b-path b-path :y-path y-path :id id :url "nil" :attributes attributes :come-from come-from :description id :download-type "local" :zipp t :password "nil")))
+    (list :path dir :b-path b-path :y-path y-path :id id :url "nil" :attributes attributes :come-from come-from :description id :download-type "local" :extractp t :zipp t :password "nil")))
 
 (defun handle-dir (dir come-from attributes)
   (if (and (probe-file (merge-pathnames #P"info.txt" dir)))
