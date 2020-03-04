@@ -125,11 +125,13 @@
   (if attributes-supplied-p
      (find name (gethash attributes *table-manager-hash*) :test #'string= :key #'(lambda (table-one) 
                                                                                    (table-id table-one)))
-     (maphash #'(lambda (k v) 
-                  (format t "key:~A" k)
-                  (find name v :test #'string= :key #'(lambda (table-one)
-                                                                    (table-id table-one))))
-              *table-manager-hash*)))
+     (let ((find-table-one nil)) 
+       (maphash #'(lambda (k v) 
+                  (setf find-table-one (find name v :test #'string= 
+                                                :key #'(lambda (table-one)
+                                                         (table-id table-one)))))
+                *table-manager-hash*) 
+       find-table-one)))
 
 (defun show-table ()
   (format t "Show Table:-------------~%")
