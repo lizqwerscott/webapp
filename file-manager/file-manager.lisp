@@ -33,6 +33,28 @@
     (make-table-dir table-one)
     (setf (table-date table-one) "2019.2.17.22:10")))
 
+(defmethod archivep-table ((table-one table)) 
+  (empty-dirp (getf (table-pi table-one) :y-path)))
+
+(defmethod benp-table ((table-one table)) 
+  (empty-dirp (getf (table-pi table-one) :b-path)))
+
+(defmethod zip-table ((table-one table)) 
+  (if (not (archivep-table table-one)) 
+      (let* ((plist-info (table-pi table-one)) 
+            (need-zip-files (directory-e (getf plist-info :b-path)))) 
+        (zip-file need-zip-files (getf plist-info :b-path) (getf plist-info :id)) 
+        (move-file (merge-pathnames (format nil "~A.zip" (getf plist-info :id)) (getf plist-info :b-path)) 
+                   (getf plist-info :y-path))) 
+      (error "Table:~A, the archive is not nil" (table-id table-one))))
+
+(defmethod extract-table ((table-one table)) 
+  (if (not (benp-table table-one)) 
+      (let ((plist-info (table-pi table-one))) 
+        (dolist (i (nth 0 (find-compressed (getf plist-info :y-path)))) 
+          (extract i (getf plist-info :b-path) (getf plist-info :password)))) 
+      (error "Table:~A, the ben is not nil" (table-id table-one))))
+
 (defmethod delete-table ((table-one table)) 
   (let ((pi-info (table-pi table-one))) 
     (delete-directory-tree (getf pi-info :path) :validate t) 
@@ -43,17 +65,24 @@
                          (table-id table-s))
                 :test #'string=))))
 
-(defmethod check-table ((table-one table) deletep)
-  (let ((archive (empty-dirp (getf (table-pi table-one) :y-path)))
-        (ben (empty-dirp (getf (table-pi table-one) :b-path))))
+(defmethod check-table ((table-one table) deletep zipp extractp)
+  (let ((archive (archivep-table table-one))
+        (ben (benp-table table-one)))
     (if (not (or archive ben))
             (progn (format t "Table:~A is empty table, need to delete;~%" (table-id table-one)) 
-                   (if deletep (progn (format t "Table:~A wil be delete" (table-id table-one))
+                   (if deletep (progn (format t "Table:~A wil be delete~%" (table-id table-one))
                                       (delete-table table-one))))
             (if (and ben (not archive))
-                (format t "Table:~A dont't have extract~%" (table-id table-one))
+                (progn (format t "Table:~A dont't have archive~%" (table-id table-one)) 
+                       (when zipp 
+                         (format t "Table:~A will be extract~%" (table-id table-one)) 
+                         (zip-table table-one)))
                 (if (and archive (not ben))
-                    (format t "Table:~A don't have ben.~%" (table-id table-one)))))))
+                    (progn (format t "Table:~A don't have ben.~%" (table-id table-one)) 
+                           (when extractp 
+                             (format t "Table:~A will be zip~%" (table-id table-one)) 
+                             (extract-table table-one))) 
+                    (format t "Table:~A is health~%" (table-id table-one)))))))
 
 (defun load-table (path)
   (format t "load-table:path~A~%" path)
@@ -111,10 +140,10 @@
            *table-manager-hash*)
   (format t "End:--------------------~%"))
 
-(defun check-all-table (&optional (deletep nil))
+(defun check-all-table (&key (deletep nil) (zipp nil) (extractp nil))
   (maphash #'(lambda (k v)
                (map 'vector #'(lambda (table)
-                                (check-table table deletep)) v)) *table-manager-hash*))
+                                (check-table table deletep zipp extractp)) v)) *table-manager-hash*))
 
 ;(load-table-group "Video")
 ;(load-table-group "Music")
