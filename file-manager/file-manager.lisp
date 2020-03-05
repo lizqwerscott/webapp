@@ -55,6 +55,15 @@
           (extract i (getf plist-info :b-path) (getf plist-info :password)))) 
       (error "Table:~A, the ben is not nil" (table-id table-one))))
 
+(defmethod delete-ben ((table-one table)) 
+  (if (and (archivep-table table-one) (benp-table table-one)) 
+      (progn (delete-directory-tree (getf (table-pi table-one) :b-path) :validate t) 
+             (ensure-directories-exist (getf (table-pi table-one) :b-path))) 
+      (if (and (not (archivep-table table-one)) (benp-table table-one)) 
+          (error "Don't have archive, it is a danger operate") 
+          (if (not (benp-table table-one)) 
+              (error "Don't have ben!")))))
+
 (defmethod delete-table ((table-one table)) 
   (let ((pi-info (table-pi table-one))) 
     (delete-directory-tree (getf pi-info :path) :validate t) 
@@ -125,11 +134,11 @@
   (if attributes-supplied-p
      (find name (gethash attributes *table-manager-hash*) :test #'string= :key #'(lambda (table-one) 
                                                                                    (table-id table-one)))
-     (let ((find-table-one nil)) 
-       (maphash #'(lambda (k v) 
-                  (setf find-table-one (find name v :test #'string= 
-                                                :key #'(lambda (table-one)
-                                                         (table-id table-one)))))
+     (let ((find-table-one "The nothing")) 
+       (maphash #'(lambda (k v)
+                    (setf find-table-one (find name v :test #'string= 
+                                                      :key #'(lambda (table-one)
+                                                               (table-id table-one)))))
                 *table-manager-hash*) 
        find-table-one)))
 
