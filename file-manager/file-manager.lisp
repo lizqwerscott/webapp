@@ -65,7 +65,7 @@
                          (table-id table-s))
                 :test #'string=))))
 
-(defmethod check-table ((table-one table) deletep zipp extractp)
+(defmethod check-table ((table-one table) deletep zipp extractp show-heathp)
   (let ((archive (archivep-table table-one))
         (ben (benp-table table-one)))
     (if (not (or archive ben))
@@ -82,7 +82,7 @@
                            (when extractp 
                              (format t "Table:~A will be zip~%" (table-id table-one)) 
                              (extract-table table-one))) 
-                    (format t "Table:~A is health~%" (table-id table-one)))))))
+                    (if show-heathp (format t "Table:~A is health~%" (table-id table-one))))))))
 
 (defun load-table (path)
   (format t "load-table:path~A~%" path)
@@ -142,10 +142,10 @@
            *table-manager-hash*)
   (format t "End:--------------------~%"))
 
-(defun check-all-table (&key (deletep nil) (zipp nil) (extractp nil))
+(defun check-all-table (&key (deletep nil) (zipp nil) (extractp nil) (show-heathp t))
   (maphash #'(lambda (k v)
                (map 'vector #'(lambda (table)
-                                (check-table table deletep zipp extractp)) v)) *table-manager-hash*))
+                                (check-table table deletep zipp extractp show-heathp)) v)) *table-manager-hash*))
 
 ;(load-table-group "Video")
 ;(load-table-group "Music")
