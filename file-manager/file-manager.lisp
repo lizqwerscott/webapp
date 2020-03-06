@@ -142,10 +142,11 @@
            *table-manager-hash*)
   (format t "End:--------------------~%"))
 
-(defun check-all-table (&key (deletep nil) (zipp nil) (extractp nil) (show-heathp t))
+(defun check-all-table (&key (deletep nil) (zipp nil) (extractp nil) (show-healthp t))
   (maphash #'(lambda (k v)
+               (format t "key:~A,length:~A~%" k (length v))
                (map 'vector #'(lambda (table)
-                                (check-table table deletep zipp extractp show-heathp)) v)) *table-manager-hash*))
+                                (check-table table deletep zipp extractp show-healthp)) v)) *table-manager-hash*))
 
 ;(load-table-group "Video")
 ;(load-table-group "Music")

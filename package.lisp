@@ -34,6 +34,10 @@
   (:use :common-lisp :uiop :web-manager.head :web-manager.arrange)
   (:export :table
            :check-table
+           :archivep-table
+           :benp-table
+           :zip-table
+           :extract-table
            :add-table
            :remove-table
            :search-table
