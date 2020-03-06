@@ -33,6 +33,7 @@
 (defpackage :web-manager.file
   (:use :common-lisp :uiop :web-manager.head :web-manager.arrange)
   (:export :table
+           :delete-ben
            :check-table
            :archivep-table
            :benp-table
