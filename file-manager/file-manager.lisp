@@ -134,13 +134,15 @@
   (if attributes-supplied-p
      (find name (gethash attributes *table-manager-hash*) :test #'string= :key #'(lambda (table-one) 
                                                                                    (table-id table-one)))
-     (let ((find-table-one "The nothing")) 
+     (let ((find-table-one nil)) 
        (maphash #'(lambda (k v)
-                    (setf find-table-one (find name v :test #'string= 
-                                                      :key #'(lambda (table-one)
-                                                               (table-id table-one)))))
+                    (let ((fins (find name v :test #'string= :key #'table-id))) 
+                      (if fins 
+                          (setf find-table-one fins))))
                 *table-manager-hash*) 
-       find-table-one)))
+       (if find-table-one 
+           find-table-one 
+           (progn (format t "Not find") find-table-one)))))
 
 (defun show-table ()
   (format t "Show Table:-------------~%")

@@ -18,6 +18,7 @@
            :move-file-or-dir
            :move-files-or-dirs
            :get-drive-path
+           :set-run-module
            :directory-e
            :find-compressed
            :empty-dirp
@@ -43,7 +44,8 @@
            :remove-table
            :search-table
            :show-table
-           :check-all-table))
+           :check-all-table 
+           :load-table-manager))
 
 (defpackage :web-manager.download
   (:use :common-lisp :uiop :web-manager.head)

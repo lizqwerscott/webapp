@@ -11,7 +11,8 @@
   (setf *debug* debugp)
   (if *debug* 
       (setf *drive-path* (make-pathname :directory '(:absolute "home" "lizqwer" "test-web" "files"))) 
-      (setf *drive-path* (make-pathname :defaults "/mnt/myusbdrive/files/"))))
+      (setf *drive-path* (make-pathname :defaults "/mnt/myusbdrive/files/"))) 
+  (web-manager.file:load-table-manager))
 
 (defun run-program-m (program parameter &key (input nil) (output nil))
   #+sbcl (sb-ext:run-program (unix-namestring program) parameter :input input :output output)
