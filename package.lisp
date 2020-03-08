@@ -35,6 +35,10 @@
   (:export :table
            :delete-ben
            :check-table
+           :archivep-table
+           :benp-table
+           :zip-table
+           :extract-table
            :add-table
            :remove-table
            :search-table

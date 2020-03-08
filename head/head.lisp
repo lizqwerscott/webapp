@@ -36,6 +36,7 @@
     (run-program-m "/usr/bin/unzip" (list (format nil "-P~A" (default-password-p password)) (unix-namestring file)) :input nil :output *standard-output*)))
 
 (defun un7z-file (file path password)
+  (format t "file:~A;~%password:~A;~%" file path password)
   (with-current-directory (path)
     (run-program-m "/usr/bin/7z" (list "x" (unix-namestring file) (format nil "-p~A" (default-password-p password))) :input nil :output *standard-output*)))
 
