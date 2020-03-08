@@ -1,10 +1,17 @@
 (in-package :web-manager.head)
 
+(defparameter *debug* nil)
 (defparameter *drive-path* (make-pathname :defaults "/mnt/myusbdrive/files/"))
 ;(defparameter *drive-path* (make-pathname :directory '(:absolute "home" "lizqwer" "test-web" "files")))
 
 (defun get-drive-path ()
   *drive-path*)
+
+(defun set-run-module (&key (debugp nil)) 
+  (setf *debug* debugp)
+  (if *debug* 
+      (setf *drive-path* (make-pathname :directory '(:absolute "home" "lizqwer" "test-web" "files"))) 
+      (setf *drive-path* (make-pathname :defaults "/mnt/myusbdrive/files/"))))
 
 (defun run-program-m (program parameter &key (input nil) (output nil))
   #+sbcl (sb-ext:run-program (unix-namestring program) parameter :input input :output output)
