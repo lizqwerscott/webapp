@@ -143,5 +143,12 @@
       (prompt-switch prompt switchs)
       (prompt-read prompt)))
 
+(defun get-parents-dir (dir) 
+  (let ((directorys (pathname-directory dir))) 
+    (make-pathname :directory (subseq directorys 0 (- (length directorys) 1)))))
+
+(defun directoryp (dir) 
+  (find dir (nth 2 (find-compressed (get-parents-dir dir)))))
+
 (in-package :cl-user)
 

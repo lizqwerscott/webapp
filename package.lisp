@@ -21,6 +21,8 @@
            :set-run-module
            :directory-e
            :find-compressed
+           :get-parents-dir
+           :directoryp
            :empty-dirp
            :prompt-read
            :prompt-read-number
