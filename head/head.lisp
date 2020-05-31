@@ -148,7 +148,7 @@
     (make-pathname :directory (subseq directorys 0 (- (length directorys) 1)))))
 
 (defun directoryp (dir) 
-  (find dir (nth 2 (find-compressed (get-parents-dir dir)))))
+  (find (namestring dir) (nth 2 (find-compressed (get-parents-dir dir))) :key #'namestring :test #'string=))
 
 (in-package :cl-user)
 
