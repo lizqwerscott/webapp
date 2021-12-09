@@ -5,6 +5,7 @@
 (defpackage :web-manager.head
   (:use :common-lisp :uiop)
   (:export :run-shell
+           :last1
            :get-directory
            :unrar-file
            :unzip-file
@@ -19,8 +20,9 @@
            :move-files-or-dirs
            :get-drive-path
            :set-run-module
-           :directory-e
            :find-compressed
+           :directory-e
+           :make-next-dir
            :get-parents-dir
            :directoryp
            :empty-dirp
@@ -28,7 +30,6 @@
            :prompt-read-number
            :prompt-switch
            :want-to-self-input))
-
 (defpackage :web-manager.arrange
   (:use :common-lisp :web-manager.head)
   (:export :arrange))

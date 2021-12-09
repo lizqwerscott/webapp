@@ -26,7 +26,8 @@
 
 (defun handle (plist-info)
   (format t "This is handle, now handle name:~A.~%" (getf plist-info :id))
-  (zip-or-unzip plist-info))
+  ;(zip-or-unzip plist-info)
+  )
 
 
 (in-package :cl-user)

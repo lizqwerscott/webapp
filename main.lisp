@@ -20,7 +20,7 @@
 
 ;;;About task some operating
 (defun add-task (plist-info)
-  "plist (:id :url :attributes :come-from :description :download-type :zipp :extractp :password)"
+  "plist (:id :url :attributes :tag :r18p :description :download-type :zipp :extractp :password :removep)"
   (let ((task-one (make-instance 'task :id (getf plist-info :id) :pi plist-info)))
     (vector-push task-one *run-task-list*)
     (start-task task-one)))
@@ -28,12 +28,15 @@
 (defun prompt-for-task-list ()
   (list :id (prompt-read "Name") 
         :url (prompt-read "Url") 
-        :attributes (want-to-self-input "Attributes" (list "Video"))
-        :come-from (want-to-self-input "Come-from" (list "MS" "YY" "LingMeiYushuo"))
+        :attributes (want-to-self-input "Attributes" (list "video" "music" "picture"))
+        ;:come-from (want-to-self-input "Come-from" (list "MS" "YY" "LingMeiYushuo"))
+        :tag (prompt-read "Tag")
         :description (prompt-read "Description")
         :download-type (want-to-self-input "Download-type" (list "local" "common" "baidu"))
+        :r18p (y-or-n-p "Is this is the r18?")
         :zipp (y-or-n-p "Do you want to zip?")
         :extractp (y-or-n-p "Do you want to extract?")
+        :removep (y-or-n-p "Do you want to remove zip file?")
         :password (want-to-self-input "Password" (list "nil"))))
 
 (defun pfts ()

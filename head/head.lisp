@@ -1,7 +1,8 @@
 (in-package :web-manager.head)
 
 (defparameter *debug* nil)
-(defparameter *drive-path* (make-pathname :defaults "/mnt/myusbdrive/files/"))
+;(defparameter *drive-path* (make-pathname :defaults "/mnt/myusbdrive/files/"))
+(defparameter *drive-path* (make-pathname :defaults "/home/lizqwer/temp/file-manager/"))
 ;(defparameter *drive-path* (make-pathname :directory '(:absolute "home" "lizqwer" "test-web" "files")))
 
 (defun get-drive-path ()
@@ -22,6 +23,9 @@
   (if isDebug-p 
       (run-program-m #P"/bin/sh" (list "-c" cmd) :input nil :output *standard-output*)
       (run-program-m #P"/bin/sh" (list "-c" cmd) :input nil :output nil)))
+
+(defun last1 (lst)
+  (car (last lst)))
 
 (defun default-password-p (password) 
   (if (string= "nil" password) "⑨" password))
@@ -99,11 +103,6 @@
   (dolist (i files-or-dirs)
     (move-file-or-dir i target)))
 
-(defun directory-e (dir)
-  (if (not (and (pathname-type dir) (pathname-name dir))) 
-      (uiop:directory* (merge-pathnames (make-pathname :name :wild :type :wild) dir))
-      (error "var is not a dir")))
-
 (defun find-compressed (path)
   (let ((compressed ()) (no-compressed ()) (dir ()))
     (dolist (file (directory-e path))
@@ -114,6 +113,20 @@
                 (setf compressed (append compressed (list file)))
                 (setf no-compressed (append no-compressed (list file)))))))
     (list compressed no-compressed dir)))
+
+(defun directory-e (dir)
+  (if (not (and (pathname-type dir) (pathname-name dir))) 
+      (uiop:directory* (merge-pathnames (make-pathname :name :wild :type :wild) dir))
+      (error "var is not a dir")))
+
+(defun make-next-dir (dir-lst path)
+  "get the path/dir/"
+  (when (directoryp path)
+    (merge-pathnames (make-pathname :directory (append (list :relative)
+                                                       (if (stringp dir-lst)
+                                                           (list dir-lst)
+                                                           dir-lst)))
+                   path)))
 
 (defun empty-dirp (dir)
   (if (directory-e dir) t nil))

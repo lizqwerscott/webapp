@@ -17,27 +17,31 @@
      :accessor table-date)))
 
 (defmethod make-table-dir ((table-one table))
-  (let* ((tablepi (table-pi table-one)) (path (merge-pathnames (pathname (format nil "~a/~a/~a/" (getf tablepi :attributes) (getf tablepi :come-from) (table-id table-one))) (get-drive-path))))
-    (setf (getf (table-pi table-one) :y-path) (ensure-directories-exist (merge-pathnames (pathname (format nil "Archive/")) path)))
-    (setf (getf (table-pi table-one) :b-path) (ensure-directories-exist (merge-pathnames (pathname (format nil "Ben/")) path)))
+  (let* ((tablepi (table-pi table-one))
+         (path (make-next-dir (list "Files"
+                                    (getf tablepi :attributes)
+                                    (if (getf tablepi :r18p) "r18" "normal")
+                                    (getf tablepi :tag)
+                                    (getf tablepi :id))
+                              (get-drive-path))))
+    ;(setf (getf (table-pi table-one) :y-path) (ensure-directories-exist (merge-pathnames (pathname (format nil "Archive/")) path)))
+    ;(setf (getf (table-pi table-one) :b-path) (ensure-directories-exist (merge-pathnames (pathname (format nil "Ben/")) path)))
     (setf (getf (table-pi table-one) :path) path)))
 
 (defmethod save-table ((table-one table))
   (let ((plist (table-pi table-one)))
-    (with-open-file (out (merge-pathnames (make-pathname :name "info" :type "txt") (getf (table-pi table-one) :path)) :direction :output :if-exists :supersede)
+    (with-open-file (out (merge-pathnames (make-pathname :name "info"
+                                                         :type "txt")
+                                          (getf (table-pi table-one) :path))
+                         :direction :output :if-exists :supersede)
       (with-standard-io-syntax 
-        (print plist out))) plist))
+        (print plist out)))
+    plist))
 
 (defmethod initialize-instance :after ((table-one table) &key loadp)
   (unless loadp 
     (make-table-dir table-one)
     (setf (table-date table-one) "2019.2.17.22:10")))
-
-(defmethod archivep-table ((table-one table)) 
-  (empty-dirp (getf (table-pi table-one) :y-path)))
-
-(defmethod benp-table ((table-one table)) 
-  (empty-dirp (getf (table-pi table-one) :b-path)))
 
 (defmethod zip-table ((table-one table)) 
   (if (not (archivep-table table-one)) 
@@ -95,29 +99,51 @@
 
 (defun load-table (path)
   (format t "load-table:path~A~%" path)
-  (let* ((plist (with-open-file (in (merge-pathnames (make-pathname :name "info" :type "txt") path)) 
+  (let* ((plist (with-open-file (in (merge-pathnames (make-pathname :name "info"
+                                                                    :type "txt")
+                                                     path)) 
                   (with-standard-io-syntax (read in))))
-         (table-one (make-instance 'table :id (getf plist :id) :pi plist :date (getf plist :date) :loadp t)))
-    (setf (getf (table-pi table-one) :path) (getf plist :path)) table-one))
+         (table-one (make-instance 'table :id (getf plist :id)
+                                          :pi plist
+                                          :date (getf plist :date)
+                                          :loadp t)))
+    (setf (getf (table-pi table-one) :path)
+          (getf plist :path))
+    table-one))
 
 (defun load-table-group (path)
-  (let* ((key (car (last (pathname-directory path))))) 
+  (let ((key (last1 (pathname-directory path)))) 
     (setf (gethash key *table-manager-hash*) (make-array 10 :fill-pointer 0 :adjustable t))
     (if (not (probe-file path))
       (ensure-directories-exist path)
-      (dolist (table-come-path (directory* (merge-pathnames (make-pathname :name :wild :type :wild) path)))
-        (dolist (table-one-path (directory* (merge-pathnames (make-pathname :name :wild :type :wild) table-come-path))) 
-          (vector-push-extend (load-table table-one-path) (gethash key *table-manager-hash*)))))))
+      (progn
+        ;;normal directory
+        (dolist (table-tag-path (directory-e (make-next-dir "normal" path)))
+          (dolist (table-one-path (directory-e table-tag-path))
+            (vector-push-extend (load-table table-one-path)
+                                (gethash key *table-manager-hash*))))
+        ;;r18 directory
+        (dolist (table-tag-path (directory-e (make-next-dir "r18" path)))
+          (dolist (table-one-path (directory-e table-tag-path))
+            (vector-push-extend (load-table table-one-path)
+                                (gethash key *table-manager-hash*))))))))
 
 (defun load-table-manager ()
-  (dolist (table-one-group (directory* (merge-pathnames (make-pathname :name :wild :type :wild) (get-drive-path))))
-    (when (not (string= (car (last (pathname-directory table-one-group))) "Downloads")) 
-      (load-table-group table-one-group))))
+  (dolist (group (directory-e (make-next-dir "Files" (get-drive-path))))
+    (load-table-group group)))
 
 (defun add-table (plist-info &optional (date "nil"))
-  (let ((table-one (make-instance 'table :id (getf plist-info :id) :pi (append plist-info (list :date date :path nil)) :date date :loadp nil)))
-    (vector-push-extend table-one (gethash (getf (table-pi table-one) :attributes) *table-manager-hash*))
-    (save-table table-one) (table-pi table-one)))
+  (let ((table-one (make-instance 'table :id (getf plist-info :id)
+                                         :pi (append plist-info (list :date date
+                                                                      :path nil))
+                                         :date date
+                                         :loadp nil)))
+    (vector-push-extend table-one
+                        (gethash (getf (table-pi table-one)
+                                       :attributes)
+                                 *table-manager-hash*))
+    (save-table table-one)
+    (table-pi table-one)))
 
 (defun remove-table (id attributes)
   (delete-table (search-table id attributes))
@@ -156,8 +182,11 @@
 (defun check-all-table (&key (deletep nil) (zipp nil) (extractp nil) (show-healthp t))
   (maphash #'(lambda (k v)
                (format t "key:~A,length:~A~%" k (length v))
-               (map 'vector #'(lambda (table)
-                                (check-table table deletep zipp extractp show-healthp)) v)) *table-manager-hash*))
+               (map 'vector
+                    #'(lambda (table)
+                        (check-table table deletep zipp extractp show-healthp))
+                    v))
+           *table-manager-hash*))
 
 ;(load-table-group "Video")
 ;(load-table-group "Music")
