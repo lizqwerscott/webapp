@@ -18,6 +18,7 @@
            :move-dirs
            :move-file-or-dir
            :move-files-or-dirs
+           :move-dir-all
            :get-drive-path
            :set-run-module
            :find-compressed
@@ -39,9 +40,6 @@
   (:export :table
            :delete-ben
            :check-table
-           :archivep-table
-           :benp-table
-           :zip-table
            :extract-table
            :add-table
            :remove-table

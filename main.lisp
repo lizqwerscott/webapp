@@ -34,10 +34,8 @@
         :description (prompt-read "Description")
         :download-type (want-to-self-input "Download-type" (list "local" "common" "baidu"))
         :r18p (y-or-n-p "Is this is the r18?")
-        :zipp (y-or-n-p "Do you want to zip?")
-        :extractp (y-or-n-p "Do you want to extract?")
         :removep (y-or-n-p "Do you want to remove zip file?")
-        :password (want-to-self-input "Password" (list "nil"))))
+        :password (want-to-self-input "Password" (list "default" "nil"))))
 
 (defun pfts ()
   (loop (add-task (prompt-for-task-list))

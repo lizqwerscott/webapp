@@ -24,8 +24,6 @@
                                     (getf tablepi :tag)
                                     (getf tablepi :id))
                               (get-drive-path))))
-    ;(setf (getf (table-pi table-one) :y-path) (ensure-directories-exist (merge-pathnames (pathname (format nil "Archive/")) path)))
-    ;(setf (getf (table-pi table-one) :b-path) (ensure-directories-exist (merge-pathnames (pathname (format nil "Ben/")) path)))
     (setf (getf (table-pi table-one) :path) path)))
 
 (defmethod save-table ((table-one table))
@@ -42,31 +40,6 @@
   (unless loadp 
     (make-table-dir table-one)
     (setf (table-date table-one) "2019.2.17.22:10")))
-
-(defmethod zip-table ((table-one table)) 
-  (if (not (archivep-table table-one)) 
-      (let* ((plist-info (table-pi table-one)) 
-            (need-zip-files (directory-e (getf plist-info :b-path)))) 
-        (zip-file need-zip-files (getf plist-info :b-path) (getf plist-info :id)) 
-        (move-file (merge-pathnames (format nil "~A.zip" (getf plist-info :id)) (getf plist-info :b-path)) 
-                   (getf plist-info :y-path))) 
-      (error "Table:~A, the archive is not nil" (table-id table-one))))
-
-(defmethod extract-table ((table-one table)) 
-  (if (not (benp-table table-one)) 
-      (let ((plist-info (table-pi table-one))) 
-        (dolist (i (nth 0 (find-compressed (getf plist-info :y-path)))) 
-          (extract i (getf plist-info :b-path) (getf plist-info :password)))) 
-      (error "Table:~A, the ben is not nil" (table-id table-one))))
-
-(defmethod delete-ben ((table-one table)) 
-  (if (and (archivep-table table-one) (benp-table table-one)) 
-      (progn (delete-directory-tree (getf (table-pi table-one) :b-path) :validate t) 
-             (ensure-directories-exist (getf (table-pi table-one) :b-path))) 
-      (if (and (not (archivep-table table-one)) (benp-table table-one)) 
-          (error "Don't have archive, it is a danger operate") 
-          (if (not (benp-table table-one)) 
-              (error "Don't have ben!")))))
 
 (defmethod delete-table ((table-one table)) 
   (let ((pi-info (table-pi table-one))) 

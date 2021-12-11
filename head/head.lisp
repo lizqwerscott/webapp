@@ -28,7 +28,9 @@
   (car (last lst)))
 
 (defun default-password-p (password) 
-  (if (string= "nil" password) "⑨" password))
+  (cond ((string= "default" password) "⑨")
+        ((string= "nil" password) "")
+        (t password)))
 
 (defun unrar-file (file path password)
   (format t "file:~A;~%path:~A;~%password:~A;~%" file path password)
@@ -101,6 +103,12 @@
 (defun move-files-or-dirs (files-or-dirs target)
   (dolist (i files-or-dirs)
     (move-file-or-dir i target)))
+
+(defun move-dir-all (directory target)
+  (run-shell (format nil
+                     "mv ~A/* ~A"
+                     (unix-namestring directory)
+                     (unix-namestring target))))
 
 (defun find-compressed (path &optional (deepth 0))
   (let ((items (directory-e path))

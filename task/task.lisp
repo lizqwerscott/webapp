@@ -45,6 +45,7 @@
 (defmethod update-task ((task-one task))
   (format t "RUn:thread name:~A~%" (get-thread-name))
   (format t "Run:update-task:~a~%" (task-id task-one))
+  ;;TODO in task info add a status every operate update the status, then reboot, use status to run
   (handle (download (add-table (task-pi task-one))))
   (setf (run-status task-one) "logging")
   (format t "Run:logging~%")
