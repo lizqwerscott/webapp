@@ -38,7 +38,9 @@
 (defun unzip-file (file path password)
   (format t "file:~A;~%path:~A;~%password:~A;~%" file path password)
   (with-current-directory (path)
-    (run-program-m "/usr/bin/unzip" (list (format nil "-P~A" (default-password-p password)) (unix-namestring file)) :input nil :output *standard-output*)))
+    (run-program-m "/usr/bin/unzip"
+                   (list (format nil "-P ~A" (default-password-p password))
+                         (unix-namestring file)) :input nil :output *standard-output*)))
 
 (defun un7z-file (file path password)
   (format t "file:~A;~%password:~A;~%" file path password)
@@ -46,10 +48,7 @@
     (run-program-m "/usr/bin/7z" (list "x" (unix-namestring file) (format nil "-p~A" (default-password-p password))) :input nil :output *standard-output*)))
 
 (defun get-directory (file)
-  (let ((directory-string "/")) 
-    (dolist (i (cdr (pathname-directory file)))
-      (setf directory-string (format nil "~A~A/" directory-string i)))
-    directory-string))
+  (make-pathname :directory (pathname-directory file)))
 
 (defun extract (file dir password)
   (cond ((string= "zip" (pathname-type file)) (unzip-file file dir password))
@@ -103,16 +102,22 @@
   (dolist (i files-or-dirs)
     (move-file-or-dir i target)))
 
-(defun find-compressed (path)
-  (let ((compressed ()) (no-compressed ()) (dir ()))
-    (dolist (file (directory-e path))
-      (if (and (not (pathname-type file)) (not (pathname-name file)))
-          (setf dir (append dir (list file)))
-          (let ((ft (pathname-type file))) 
-            (if (or (string= ft "zip") (string= ft "rar") (string= ft "7z"))
-                (setf compressed (append compressed (list file)))
-                (setf no-compressed (append no-compressed (list file)))))))
-    (list compressed no-compressed dir)))
+(defun find-compressed (path &optional (deepth 0))
+  (let ((items (directory-e path))
+        (compressed-lst-now nil))
+    ;(format t "~A~%" items)
+    (when (and items (< deepth 4))
+      (dolist (item items)
+        (if (directoryp item)
+            (setf compressed-lst-now
+                  (append compressed-lst-now
+                          (find-compressed item (+ deepth 1))))
+            (if (find (pathname-type item)
+                      '("zip" "rar" "7z")
+                      :test #'string=)
+                (setf compressed-lst-now
+                      (append compressed-lst-now (list item)))))))
+    compressed-lst-now))
 
 (defun directory-e (dir)
   (if (not (and (pathname-type dir) (pathname-name dir))) 
@@ -156,12 +161,15 @@
       (prompt-switch prompt switchs)
       (prompt-read prompt)))
 
+(defun remove-last (lst)
+  (when lst
+    (subseq lst 0 (- (length lst) 1))))
+
 (defun get-parents-dir (dir) 
-  (let ((directorys (pathname-directory dir))) 
-    (make-pathname :directory (subseq directorys 0 (- (length directorys) 1)))))
+  (make-pathname :directory (remove-last (pathname-directory dir))))
 
 (defun directoryp (dir) 
-  (find (namestring dir) (nth 2 (find-compressed (get-parents-dir dir))) :key #'namestring :test #'string=))
+  (equal dir (get-directory dir)))
 
 (in-package :cl-user)
 

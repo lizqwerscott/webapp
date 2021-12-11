@@ -1,6 +1,5 @@
 (in-package :web-manager.handle)
 
-
 (defun recursive-find-compressed-and-extract (path)
   (dolist (compressed (nth 0 (find-compressed path)))
     (extract compressed (get-directory compressed) "nil"))
@@ -27,7 +26,18 @@
 (defun handle (plist-info)
   (format t "This is handle, now handle name:~A.~%" (getf plist-info :id))
   ;(zip-or-unzip plist-info)
-  )
-
+  (do ((files (find-compressed (getf plist-info :path))
+              (find-compressed (getf plist-info :path)))
+       (i 0 (+ i 1)))
+      ((or (not files) (= i 4)))
+    (format t "new search compressed:~A~%" (+ i 1))
+    (dolist (file files)
+      (format t "extract ~A~%" file)
+      (extract file (get-directory file) "")
+      (format t "delete-file ~A~%" file)
+      (delete-file file))
+    (sleep 1)
+    (format t "finish a compressed~%"))
+  (format t "Finish handle"))
 
 (in-package :cl-user)
