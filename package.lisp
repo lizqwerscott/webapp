@@ -30,7 +30,11 @@
            :prompt-read
            :prompt-read-number
            :prompt-switch
-           :want-to-self-input))
+           :want-to-self-input
+           :update-plist-key
+           :save-plist-file
+           :load-plist-file
+           :get-task-save-path))
 (defpackage :web-manager.arrange
   (:use :common-lisp :web-manager.head)
   (:export :arrange))

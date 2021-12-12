@@ -9,6 +9,9 @@
 ;(defparameter *finish-task-list* (make-array 5 :fill-pointer 0 :adjustable t) "The Finish task List")
 ;(defparameter *failure-task-list* (make-array 5 :fill-pointer 0 :adjustable t) "The Failure task List")
 
+(defun load-list ()
+  ())
+
 (defun show-list ()
   (doTimes (i (length *run-task-list*))
     (format t "[~a]:Start~%" (+ i 1))
@@ -21,7 +24,10 @@
 ;;;About task some operating
 (defun add-task (plist-info)
   "plist (:id :url :attributes :tag :r18p :description :download-type :zipp :extractp :password :removep)"
-  (let ((task-one (make-instance 'task :id (getf plist-info :id) :pi plist-info)))
+  (let ((task-one (make-instance 'task
+                                 :id (getf plist-info :id)
+                                 :pi (append plist-info
+                                             (list :status "add-table")))))
     (vector-push task-one *run-task-list*)
     (start-task task-one)))
 

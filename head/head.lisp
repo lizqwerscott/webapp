@@ -67,43 +67,6 @@
                                                                                                          (format nil "./~A.~A" (pathname-name x) (pathname-type x))
                                                                                                          (format nil "./~A" (car (last (cdr (pathname-directory x))))))) files)) :input nil :output *standard-output*)))
 
-(defun move-file (file path)
-  (format t "move files:~A||path:~A~%" (namestring file) (namestring path))
-  (if (pathname-name file)
-      ;(rename-file-overwriting-target file (merge-pathnames (make-pathname :name (pathname-name file) :type (pathname-type file)) path))
-      (run-program-m "/bin/mv" (list (unix-namestring file) (unix-namestring path)))
-      (format t "Not is the file"))
-  (if (not (pathname-name file)) 
-     (merge-pathnames (make-pathname :directory (car (last (pathname-directory file)))) path)
-     (merge-pathnames (make-pathname :name (pathname-name file) :type (pathname-type file)) path)))
-
-(defun move-files (files path)
-  (dolist (i files)
-    (move-file i path)))
-
-(defun move-dir (dir path)
-  (let ((new-path (make-pathname :directory (append (pathname-directory path) (last (pathname-directory dir))))) 
-        (files-dirs (find-compressed dir))) 
-    (ensure-directories-exist new-path)
-    (move-files (append (nth 0 files-dirs) (nth 1 files-dirs)) new-path)
-    (if (nth 2 files-dirs)
-        (move-dirs (nth 2 files-dirs) new-path)))
-  (delete-empty-directory dir))
-
-(defun move-dirs (dirs path)
-  (dolist (i dirs)
-    (move-dir i path)))
-
-(defun move-file-or-dir (file-or-path target)
-  (format t "move-file-or-dir:~A||~A~%" (namestring file-or-path) (namestring target))
-  (if (and (pathname-name file-or-path) (pathname-type file-or-path))
-      (move-file file-or-path target)
-      (move-dir file-or-path target)))
-
-(defun move-files-or-dirs (files-or-dirs target)
-  (dolist (i files-or-dirs)
-    (move-file-or-dir i target)))
-
 (defun move-dir-all (directory target)
   (run-shell (format nil
                      "mv ~A/* ~A"
@@ -178,6 +141,29 @@
 
 (defun directoryp (dir) 
   (equal dir (get-directory dir)))
+
+(defun update-plist-key (plist key data)
+  (setf (getf plist key) data)
+  plist)
+
+(defun save-plist-file (data path)
+  (when (and (listp data) data)
+    (with-open-file (out path
+                         :direction :output
+                         :if-exists :supersede)
+      (with-standard-io-syntax
+        (print data out)))))
+
+(defun load-plist-file (path)
+  (with-open-file (in path)
+    (with-standard-io-syntax
+      (read in))))
+
+(defun get-task-save-path (name)
+  (make-pathname :name name
+                 :type "txt"
+                 :defaults (make-next-dir "tasks"
+                                          (get-drive-path))))
 
 (in-package :cl-user)
 

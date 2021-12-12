@@ -26,20 +26,17 @@
                               (get-drive-path))))
     (setf (getf (table-pi table-one) :path) path)))
 
-(defmethod save-table ((table-one table))
-  (let ((plist (table-pi table-one)))
-    (with-open-file (out (merge-pathnames (make-pathname :name "info"
-                                                         :type "txt")
-                                          (getf (table-pi table-one) :path))
-                         :direction :output :if-exists :supersede)
-      (with-standard-io-syntax 
-        (print plist out)))
-    plist))
-
 (defmethod initialize-instance :after ((table-one table) &key loadp)
   (unless loadp 
     (make-table-dir table-one)
     (setf (table-date table-one) "2019.2.17.22:10")))
+
+(defmethod save-table ((table-one table))
+  (save-plist-file (table-pi table-one)
+                   (make-pathname :name "info"
+                                  :type "txt"
+                                  :defaults (getf (table-pi table-one) :path))))
+
 
 (defmethod delete-table ((table-one table)) 
   (let ((pi-info (table-pi table-one))) 
@@ -72,17 +69,12 @@
 
 (defun load-table (path)
   (format t "load-table:path~A~%" path)
-  (let* ((plist (with-open-file (in (merge-pathnames (make-pathname :name "info"
-                                                                    :type "txt")
-                                                     path)) 
-                  (with-standard-io-syntax (read in))))
-         (table-one (make-instance 'table :id (getf plist :id)
-                                          :pi plist
-                                          :date (getf plist :date)
-                                          :loadp t)))
-    (setf (getf (table-pi table-one) :path)
-          (getf plist :path))
-    table-one))
+  (let ((plist (load-plist-file path)))
+    (make-instance 'table
+                   :id (getf plist :id)
+                   :pi plist
+                   :date (getf plist :date)
+                   :loadp t)))
 
 (defun load-table-group (path)
   (let ((key (last1 (pathname-directory path)))) 
@@ -106,17 +98,24 @@
     (load-table-group group)))
 
 (defun add-table (plist-info &optional (date "nil"))
-  (let ((table-one (make-instance 'table :id (getf plist-info :id)
-                                         :pi (append plist-info (list :date date
-                                                                      :path nil))
-                                         :date date
-                                         :loadp nil)))
-    (vector-push-extend table-one
-                        (gethash (getf (table-pi table-one)
-                                       :attributes)
-                                 *table-manager-hash*))
-    (save-table table-one)
-    (table-pi table-one)))
+  (format t "add-table plist:~A~%" plist-info)
+  (if (string= "add-table" (getf plist-info :status))
+      (let ((table-one (make-instance 'table :id (getf plist-info :id)
+                                             :pi (append plist-info
+                                                         (list :date date
+                                                               :path nil))
+                                             :date date
+                                             :loadp nil)))
+        (vector-push-extend table-one
+                            (gethash (getf (table-pi table-one)
+                                           :attributes)
+                                     *table-manager-hash*))
+        (save-table table-one)
+        (save-plist-file (update-plist-key (table-pi table-one)
+                                           :status
+                                           "download")
+                         (get-task-save-path (getf (table-pi table-one) :id))))
+      plist-info))
 
 (defun remove-table (id attributes)
   (delete-table (search-table id attributes))

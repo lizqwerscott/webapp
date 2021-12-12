@@ -40,13 +40,20 @@
   (format t "Now run the thread module~%"))
 
 (defmethod start-task ((task-one task))
-  (make-thread (lambda () (update-task task-one)) :name "thread1"))
+  (make-thread (lambda ()
+                 (update-task task-one))
+               :name "thread1"))
  
 (defmethod update-task ((task-one task))
   (format t "RUn:thread name:~A~%" (get-thread-name))
   (format t "Run:update-task:~a~%" (task-id task-one))
-  ;;TODO in task info add a status every operate update the status, then reboot, use status to run
-  (handle (download (add-table (task-pi task-one))))
+  (let ((task-path (get-task-save-path (task-id task-one))))
+    (when (not (probe-file task-path))
+      (save-plist-file (task-pi task-one) task-path)))
+  (when (not (string= "finish" (getf (task-pi task-one) :status)))
+    (handle (download (add-table (task-pi task-one)))))
+  ;remove task file
+  (delete-file (get-task-save-path (task-id task-one)))
   (setf (run-status task-one) "logging")
   (format t "Run:logging~%")
   (format t "Run:")

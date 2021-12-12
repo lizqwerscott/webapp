@@ -19,12 +19,23 @@
   (format t "download finish~%"))
 
 (defun download (plist)
-  (format t "download-all~%")
-  (cond ((string= (getf plist :download-type) "common") (download-common plist))
-        ((string= (getf plist :download-type) "baidu") (download-baidu plist))
-        ((string= (getf plist :download-type) "local") (download-local plist))
-        ((not (getf plist :download-type)) (error "download-type is nil")))
-  plist)
+  (format t "download plist:~A~%" plist)
+  (if (string= (getf plist :status) "download")
+      (progn
+        (format t "download-all~%")
+        (cond ((string= (getf plist :download-type) "common")
+               (download-common plist))
+              ((string= (getf plist :download-type) "baidu")
+               (download-baidu plist))
+              ((string= (getf plist :download-type) "local")
+               (download-local plist))
+              ((not (getf plist :download-type))
+               (error "download-type is nil")))
+        (save-plist-file (update-plist-key plist
+                                           :status
+                                           "handle")
+                         (get-task-save-path (getf plist :id))))
+      plist))
 
 
 
