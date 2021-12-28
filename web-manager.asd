@@ -12,7 +12,7 @@
  :licence "BSD sans advertising clause (see file COPYING for details)"
  :description "web-manager"
  :long-description "the download, zip and file manager."
- :depends-on ("bordeaux-threads" "uiop")
+ :depends-on ("bordeaux-threads" "uiop" :cl-transmission :cl-strings)
  :components ((:file "package")
               (:module "head"
                 :serial t

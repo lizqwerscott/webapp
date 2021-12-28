@@ -53,7 +53,7 @@
            :load-table-manager))
 
 (defpackage :web-manager.download
-  (:use :common-lisp :uiop :web-manager.head)
+  (:use :common-lisp :uiop :web-manager.head :cl-transmission :cl-strings)
   (:export :download))
 
 (defpackage :web-manager.handle

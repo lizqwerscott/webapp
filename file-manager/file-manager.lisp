@@ -69,7 +69,9 @@
 
 (defun load-table (path)
   (format t "load-table:path~A~%" path)
-  (let ((plist (load-plist-file path)))
+  (let ((plist (load-plist-file (make-pathname :name "info"
+                                               :type "txt"
+                                               :defaults path))))
     (make-instance 'table
                    :id (getf plist :id)
                    :pi plist
