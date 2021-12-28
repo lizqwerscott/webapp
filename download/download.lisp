@@ -9,8 +9,6 @@
                               :host "127.0.0.1"
                               :credentials '(("lizqwer" "12138")))))
 
-(download-bt-test)
-
 (defun get-bt-url-hashstring (url)
   (subseq (car (last (split url ":"))) 0 40))
 
