@@ -1,7 +1,7 @@
 (in-package :web-manager.head)
 
 (defparameter *debug* nil)
-(defparameter *drive-path* (make-pathname :defaults "/mnt/myusbdrive/files/"))
+(defparameter *drive-path* (make-pathname :defaults "/mnt/myusbdrive/"))
 ;(defparameter *drive-path* (make-pathname :defaults "/home/lizqwer/temp/file-manager/"))
 ;(defparameter *drive-path* (make-pathname :directory '(:absolute "home" "lizqwer" "test-web" "files")))
 
